@@ -18,6 +18,22 @@
 .PARAMETER Repository
     The target repository. Defaults to 'PSGallery'.
 
+.PARAMETER Validate
+    Runs a pre-flight check without publishing. Builds the staging directory,
+    verifies manifest integrity, checks no excluded folders leaked in, and
+    confirms FunctionsToExport matches Public\ .ps1 files. No API key required.
+
+.EXAMPLE
+    .\build\Publish-ToGallery.ps1 -Validate
+
+    Pre-flight validation — builds staging, verifies contents, prints pass/fail report.
+    Safe to run at any time; no publish occurs and no API key is needed.
+
+.EXAMPLE
+    .\build\Publish-ToGallery.ps1 -Validate -Verbose
+
+    Pre-flight validation with detailed staging output.
+
 .EXAMPLE
     .\build\Publish-ToGallery.ps1 -ApiKey 'oy2abc...'
 
@@ -44,15 +60,18 @@
     Publish-Module
     Test-ModuleManifest
 #>
-[CmdletBinding(SupportsShouldProcess)]
+[CmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'Publish')]
 param(
-    [Parameter(Mandatory, HelpMessage = 'PowerShell Gallery NuGet API key.')]
+    [Parameter(ParameterSetName = 'Publish', Mandatory, HelpMessage = 'PowerShell Gallery NuGet API key.')]
     [ValidateNotNullOrEmpty()]
     [string]$ApiKey,
 
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string]$Repository = 'PSGallery'
+    [string]$Repository = 'PSGallery',
+
+    [Parameter(ParameterSetName = 'Validate', Mandatory)]
+    [switch]$Validate
 )
 
 trap {
@@ -82,7 +101,8 @@ Write-Verbose "Repo:    $($Repository)"
 # ── Build staging directory ───────────────────────────────────────────────────
 # Staging folder must be named 'UserAdminModule' so Publish-Module picks up the
 # correct module name from the directory name.
-$stagingBase = Join-Path $env:TEMP "UAM-publish-$(Get-Date -Format 'yyyyMMddHHmmss')"
+# Use GetFullPath to expand any 8.3 short names (e.g. LUKELE~1) — dotnet pack fails on 8.3 paths
+$stagingBase = Join-Path ([System.IO.Path]::GetFullPath($env:TEMP)) "UAM-publish-$(Get-Date -Format 'yyyyMMddHHmmss')"
 $stagingPath = Join-Path $stagingBase 'UserAdminModule'
 New-Item -Path $stagingPath -ItemType Directory -Force | Out-Null
 Write-Verbose "Staging directory: $($stagingPath)"
@@ -91,7 +111,7 @@ Write-Verbose "Staging directory: $($stagingPath)"
 $excludedDirs = [System.Collections.Generic.HashSet[string]]::new(
     [System.StringComparer]::OrdinalIgnoreCase
 )
-@('.github', 'build') | ForEach-Object { $null = $excludedDirs.Add($_) }
+@('.github', 'build', '.vscode', 'docs') | ForEach-Object { $null = $excludedDirs.Add($_) }
 
 # File name patterns excluded from the PSGallery package
 $excludedPatterns = @(
@@ -135,6 +155,74 @@ Get-ChildItem -Path $stagingPath -Recurse -Directory -Filter 'Tests' -ErrorActio
 Write-Verbose "Staging complete. Contents:"
 Get-ChildItem -Path $stagingPath | ForEach-Object { Write-Verbose "  $($_.Name)" }
 
+# ── Validate (pre-flight check — no publish) ──────────────────────────────────
+if ($Validate) {
+    $pass   = $true
+    $report = [System.Collections.Generic.List[string]]::new()
+
+    $report.Add("  [OK ] Manifest valid: $($manifest.Name) v$($fullVersion)")
+
+    $leaked = Get-ChildItem -Path $stagingPath -Directory |
+        Where-Object { $excludedDirs.Contains($_.Name) }
+    if ($leaked) {
+        $pass = $false
+        foreach ($l in $leaked) { $report.Add("  [FAIL] Excluded dir present in staging: $($l.Name)") }
+    }
+    else {
+        $report.Add('  [OK ] No excluded directories present in staging')
+    }
+
+    $stagedManifest = Join-Path $stagingPath 'UserAdminModule.psd1'
+    if (Test-Path $stagedManifest) {
+        $report.Add('  [OK ] Module manifest present in staging')
+    }
+    else {
+        $pass = $false
+        $report.Add('  [FAIL] Module manifest NOT found in staging')
+    }
+
+    $exportedFns = @($manifest.ExportedFunctions.Keys | Sort-Object)
+    $publicPs1   = @(Get-ChildItem -Path (Join-Path $stagingPath 'Public') -Filter '*.ps1' -ErrorAction SilentlyContinue |
+        Select-Object -ExpandProperty BaseName | Sort-Object)
+    $missing = @($exportedFns | Where-Object { $_ -notin $publicPs1 })
+    $extra   = @($publicPs1   | Where-Object { $_ -notin $exportedFns })
+    if ($missing.Count -gt 0) {
+        $pass = $false
+        foreach ($m in $missing) { $report.Add("  [FAIL] In FunctionsToExport but no .ps1 found: $($m)") }
+    }
+    if ($extra.Count -gt 0) {
+        foreach ($e in $extra) { $report.Add("  [WARN] .ps1 exists but not in FunctionsToExport: $($e)") }
+    }
+    if ($missing.Count -eq 0 -and $extra.Count -eq 0) {
+        $report.Add("  [OK ] FunctionsToExport matches Public\ .ps1 files ($($exportedFns.Count) functions)")
+    }
+
+    if ($stagingPath -match '~\d') {
+        $pass = $false
+        $report.Add('  [FAIL] Staging path contains 8.3 short name — dotnet pack will fail')
+        $report.Add("         Path: $($stagingPath)")
+    }
+    else {
+        $report.Add('  [OK ] Staging path is a full long path')
+    }
+
+    Write-Information '' -InformationAction Continue
+    Write-Information "Pre-flight Validation — UserAdminModule v$($fullVersion)" -InformationAction Continue
+    Write-Information ('-' * 60) -InformationAction Continue
+    foreach ($line in $report) { Write-Information $line -InformationAction Continue }
+    Write-Information ('-' * 60) -InformationAction Continue
+    if ($pass) {
+        Write-Information '  RESULT: PASS — safe to publish' -InformationAction Continue
+    }
+    else {
+        Write-Information '  RESULT: FAIL — resolve issues above before publishing' -InformationAction Continue
+    }
+    Write-Information '' -InformationAction Continue
+
+    Remove-Item -Path $stagingBase -Recurse -Force -ErrorAction SilentlyContinue
+    return
+}
+
 # ── Publish ───────────────────────────────────────────────────────────────────
 $publishParams = @{
     Path        = $stagingPath
@@ -143,10 +231,6 @@ $publishParams = @{
     ErrorAction = 'Stop'
     Verbose     = $PSBoundParameters.ContainsKey('Verbose')
 }
-if ($prerelease) {
-    $publishParams['AllowPrerelease'] = $true
-}
-
 if ($PSCmdlet.ShouldProcess("UserAdminModule v$($fullVersion)", "Publish to $($Repository)")) {
     Write-Information "Publishing UserAdminModule v$($fullVersion) to $($Repository)..." -InformationAction Continue
     Publish-Module @publishParams
