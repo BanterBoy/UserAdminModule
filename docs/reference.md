@@ -87,7 +87,7 @@ Scans all discovered category folders, extracts comment-based help from each `.p
 Invoke-FunctionIndexRegeneration [-Verbose]
 ```
 
-Run this after adding or removing functions to keep the HTML browser and Markdown index current.
+Run this after adding or removing functions. You can also trigger this automatically via `Open-ModuleMenuApp -Regenerate`, which calls it if the index does not exist.
 
 {: .important }
 > `FunctionIndex.json` and `FunctionIndex.md` are auto-generated. Do not edit them manually — changes will be overwritten on the next regeneration.
@@ -124,7 +124,7 @@ These functions are loaded into the **global** scope when `Import-Module UserAdm
 | `Show-IsAdminOrNot` | Displays whether the current session is running as administrator |
 | `Set-DisplayIsAdmin` | Configures an admin indicator in the window title |
 | `New-Greeting` | Displays a time-of-day greeting with system info on profile load |
-| `Open-ModuleMenuApp` | Opens the HTML function browser in the default browser |
+| `Open-ModuleMenuApp` | Opens the HTML function browser in the default browser. Pass `-Regenerate` to rebuild the index and HTML before opening — handles `Invoke-FunctionIndexRegeneration` automatically if needed |
 | `Get-ConsoleConfig` | Returns current console font, size, and colour configuration |
 | `Set-ConsoleConfig` | Applies console font, size, and colour settings |
 | `Set-Home` | Sets the working directory to the user's home folder |
