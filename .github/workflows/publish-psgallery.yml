@@ -1,0 +1,65 @@
+name: Publish to PowerShell Gallery
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Module Manifest
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test module manifest
+        shell: pwsh
+        run: |
+          $manifest = Test-ModuleManifest -Path '.\UserAdminModule.psd1' -ErrorAction Stop
+          Write-Host "Module:  $($manifest.Name)" -ForegroundColor Cyan
+          Write-Host "Version: $($manifest.Version)" -ForegroundColor Cyan
+          Write-Host "Manifest validation passed." -ForegroundColor Green
+
+      - name: Verify required files exist
+        shell: pwsh
+        run: |
+          $required = @(
+            'UserAdminModule.psm1',
+            'UserAdminModule.psd1',
+            'Public\Import-PersonalModules.ps1',
+            'Public\Initialize-UserAdminModule.ps1',
+            'Private\Get-UserAdminModuleConfig.ps1',
+            'Public\Invoke-PersonalModulesMenu.ps1',
+            'Public\New-PSM1Module.ps1',
+            'Public\Invoke-FunctionIndexRegeneration.ps1',
+            'Shell\Shell.psm1'
+          )
+          $missing = $required | Where-Object { -not (Test-Path $_) }
+          if ($missing) {
+            Write-Error "Missing required files: $($missing -join ', ')"
+            exit 1
+          }
+          Write-Host "All required files present." -ForegroundColor Green
+
+  publish:
+    name: Publish to PSGallery
+    needs: validate
+    runs-on: windows-latest
+    environment: PSGallery
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PSMenu dependency
+        shell: pwsh
+        run: |
+          Install-Module PSMenu -Force -Scope CurrentUser -ErrorAction SilentlyContinue
+
+      - name: Publish module
+        shell: pwsh
+        env:
+          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+        run: |
+          .\build\Publish-ToGallery.ps1 -ApiKey $env:PSGALLERY_API_KEY -Verbose

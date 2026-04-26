@@ -1,0 +1,21 @@
+# Profile backups (created by Initialize-UserAdminModule -UpdateProfile)
+*.bak
+
+# Generated function index artefacts (rebuilt by Invoke-FunctionIndexRegeneration)
+FunctionIndex.json
+FunctionIndex.md
+ValidationReport.json
+
+# Pester test result output
+testResults.xml
+*.testResults.xml
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor files
+.vscode/
+*.suo
+*.user
