@@ -1,7 +1,7 @@
 ---
 name: github-management
 description: >
-  GitHub specialist for the BanterBoy/RDGScripts repository. Manages repository
+  GitHub specialist for the BanterBoy/UserAdminModule repository. Manages repository
   settings, wiki documentation, issues, pull requests, labels, releases, and
   changelogs. USE FOR: creating or updating wiki pages, generating issue/PR
   templates, triaging issues, reviewing PRs with checklists, creating releases
@@ -11,11 +11,11 @@ description: >
   or managing other repositories.
 ---
 
-# GitHub Management Skill — BanterBoy/RDGScripts
+# GitHub Management Skill — BanterBoy/UserAdminModule
 
 ## Purpose
 
-Provide a structured, repeatable workflow for managing the **BanterBoy/RDGScripts** GitHub repository — covering repository configuration, wiki documentation, issue/PR lifecycle, and release management. All operations target the `prod` branch (default).
+Provide a structured, repeatable workflow for managing the **BanterBoy/UserAdminModule** GitHub repository — covering repository configuration, wiki documentation, issue/PR lifecycle, and release management. All operations target the `main` branch (default).
 
 ## When This Skill Applies
 
@@ -26,7 +26,7 @@ Activate when the user:
 - Needs to **create or review pull requests** (templates, checklists, descriptions)
 - Asks about **releases**, changelogs, tagging, or release notes
 - Wants to **configure repository settings** (branch protection, labels, collaborators)
-- Mentions "GitHub", "wiki", "issue template", "PR template", "release", "changelog", or "repo settings" in context of RDGScripts
+- Mentions "GitHub", "wiki", "issue template", "PR template", "release", "changelog", or "repo settings" in context of UserAdminModule
 - Asks to audit or improve the repository's GitHub configuration
 
 ## Repository Context
@@ -34,11 +34,11 @@ Activate when the user:
 | Property | Value |
 |---|---|
 | **Owner** | BanterBoy |
-| **Repository** | RDGScripts |
-| **Default Branch** | prod |
-| **Current Branch** | prod |
-| **Description** | PowerShell scripts and modules for Windows infrastructure automation |
-| **Key Folders** | Functions/, Scripts/, UserAdminModule/, AutomatedLab/, FirewallUpgrade/, DHCPmigration/ |
+| **Repository** | UserAdminModule |
+| **Default Branch** | main |
+| **Current Branch** | main |
+| **Description** | PSGallery-published PowerShell function management framework |
+| **Key Folders** | Public/, Shell/Public/, Private/, profiles/, resources/, build/ |
 
 ### Current GitHub Configuration State
 
@@ -46,11 +46,11 @@ Activate when the user:
 |---|---|
 | Issue Templates | **Not configured** — `.github/ISSUE_TEMPLATE/` missing |
 | PR Template | **Not configured** — `.github/pull_request_template.md` missing |
-| GitHub Actions Workflows | **Not configured** — `.github/workflows/` missing |
+| GitHub Actions Workflows | **Configured** — `.github/workflows/publish-psgallery.yml` |
 | Labels | Configured (bug, codex, documentation, duplicate, enhancement, good first issue, help wanted, invalid, question, wontfix) |
 | CHANGELOG | **Not present** |
 | CONTRIBUTING.md | **Not present** |
-| LICENSE | **Not present** |
+| LICENSE | Present — `LICENSE` at repo root |
 | Wiki | Use GitHub wiki or in-repo `/docs` folder |
 
 ## Available Tools
@@ -80,7 +80,7 @@ User asks to create wiki pages, document a folder/module, generate documentation
 
 ### Wiki Page Standard Format
 
-All wiki pages for RDGScripts follow this structure:
+All wiki pages for UserAdminModule follow this structure:
 
 ```markdown
 # {Page Title}
@@ -135,7 +135,7 @@ All wiki pages for RDGScripts follow this structure:
 ### Wiki Navigation Structure (Home.md)
 
 ```markdown
-# RDGScripts Wiki
+# UserAdminModule Wiki
 
 ## Quick Links
 
@@ -143,22 +143,21 @@ All wiki pages for RDGScripts follow this structure:
 - [Contributing](Contributing)
 - [Coding Standards](Coding-Standards)
 
-## Script Documentation
+## Module Documentation
 
-| Folder | Description | Wiki Page |
+| Section | Description | Wiki Page |
 |---|---|---|
-| Functions/ | Shared reusable functions | [Functions](Functions) |
-| AutomatedLab/ | Hyper-V lab automation | [AutomatedLab](AutomatedLab) |
-| DHCPmigration/ | DHCP server migration tools | [DHCP-Migration](DHCP-Migration) |
-| FirewallUpgrade/ | Firewall upgrade scripts | [Firewall-Upgrade](Firewall-Upgrade) |
-| UserAdminModule/ | User administration module | [UserAdminModule](UserAdminModule) |
-| Scripts/ | Standalone utility scripts | [Scripts](Scripts) |
+| Public/ | 5 exported framework functions | [Framework-Functions](Framework-Functions) |
+| Shell/Public/ | 16 UX/profile functions | [Shell-Functions](Shell-Functions) |
+| Private/ | Internal helpers | [Private-Helpers](Private-Helpers) |
+| profiles/ | Reference profile scripts | [Profiles](Profiles) |
+| resources/ | Data files and generators | [Resources](Resources) |
 
 ## Repository Management
 
 - [Release Process](Release-Process)
 - [Branch Strategy](Branch-Strategy)
-- [Change Requests](Change-Requests)
+- [PSGallery Publishing](PSGallery-Publishing)
 ```
 
 ---
@@ -421,7 +420,7 @@ Follow **Semantic Versioning** (SemVer): `MAJOR.MINOR.PATCH`
 ```markdown
 # Changelog
 
-All notable changes to the RDGScripts repository will be documented in this file.
+All notable changes to the UserAdminModule repository will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
@@ -495,7 +494,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 See [CHANGELOG.md](CHANGELOG.md) for complete details.
 
-**Full Diff:** [{prev_version}...v{VERSION}](https://github.com/BanterBoy/RDGScripts/compare/{prev_version}...v{VERSION})
+**Full Diff:** [{prev_version}...v{VERSION}](https://github.com/BanterBoy/UserAdminModule/compare/{prev_version}...v{VERSION})
 ```
 
 7. **Create GitHub release** — Once `gh` CLI is available:
@@ -609,7 +608,7 @@ Before completing any GitHub management task, verify:
 - [ ] Template sections guide the reporter to provide actionable information
 
 ### PR Templates
-- [ ] Checklist enforces RDGScripts coding standards (trap statements, approved verbs, CmdletBinding, validation, help)
+- [ ] Checklist enforces UserAdminModule coding standards (trap statements, approved verbs, CmdletBinding, validation, help)
 - [ ] Type of change options cover all scenarios
 - [ ] Related issues field included
 
@@ -620,7 +619,7 @@ Before completing any GitHub management task, verify:
 - [ ] Git tag created and pushed
 
 ### Repository Configuration
-- [ ] Branch protection prevents direct pushes to prod
+- [ ] Branch protection prevents direct pushes to main
 - [ ] Workflows validate PowerShell standards on PR
 
 ---
@@ -629,8 +628,8 @@ Before completing any GitHub management task, verify:
 
 | Field | Default Value |
 |---|---|
-| Repository | BanterBoy/RDGScripts |
-| Default Branch | prod |
+| Repository | BanterBoy/UserAdminModule |
+| Default Branch | main |
 | Assignee | BanterBoy |
 | Author | Luke Leigh |
 | Version Scheme | SemVer (MAJOR.MINOR.PATCH) |
@@ -654,7 +653,7 @@ Before completing any GitHub management task, verify:
 
 > "Create a PR template"
 
-→ Generates `.github/pull_request_template.md` with RDGScripts coding standards checklist
+→ Generates `.github/pull_request_template.md` with UserAdminModule coding standards checklist
 
 > "Generate release notes for everything since last month"
 

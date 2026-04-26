@@ -8,6 +8,18 @@ UserAdminModule is a PSGallery-published PowerShell function management framewor
 **Published:** PowerShell Gallery — `Install-Module UserAdminModule -AllowPrerelease`  
 **Targets:** PowerShell 5.1 and 7+, dual-compatible unless explicitly noted
 
+---
+
+## Default Agent
+
+All work in this repository is managed through the **UserAdminModule Coordinator** agent.
+
+- **Start here:** Open Copilot Chat → select **UserAdminModule Coordinator** from the agent picker
+- It maps the repo, maintains persistent memory in `.github/ORCHESTRATOR.md`, and delegates all implementation to specialist agents
+- Specialist agents (`useradminmodule`, `pester-testing`, `new-function-tests`, `documentation-generation`, `github-management`) should only be invoked directly if you already know exactly what you need
+
+---
+
 ### Structure at a Glance
 
 ```

@@ -2,7 +2,7 @@
 name: new-function-tests
 description: >
   MANDATORY QUALITY GATE — enforce Pester v5 test creation alongside every new PowerShell
-  function written in the RDGScripts repository. USE FOR: any time a new function is created
+  function written in the UserAdminModule repository. USE FOR: any time a new function is created
   or requested — ensures tests are written before the function is considered done. Provides
   test file templates and mock patterns for credential functions, connection/disconnect
   functions, AD, Exchange Online, on-premises Exchange, Microsoft Graph, Intune, Defender,
@@ -17,7 +17,7 @@ description: >
 
 ## Purpose
 
-Every new function in RDGScripts MUST have a corresponding Pester v5 test file created
+Every new function in UserAdminModule MUST have a corresponding Pester v5 test file created
 **at the same time** as the function itself. This skill activates on any function creation
 request and enforces that workflow. A function is not considered done until its test file
 exists, the tests pass, and the quality checklist is signed off.
@@ -57,10 +57,8 @@ Determine the test path:
 
 | Function Location | Test File Location |
 |---|---|
-| `UserAdminModule/<Submodule>/Public/Verb-Noun.ps1` | `UserAdminModule/<Submodule>/Tests/Verb-Noun.Tests.ps1` |
-| `Functions/FunctionName.ps1` | `Functions/FunctionName.Tests.ps1` |
-| `Scripts/ScriptName.ps1` | `Scripts/ScriptName.Tests.ps1` |
-| `<Scenario>/Script.ps1` | `<Scenario>/Tests/Script.Tests.ps1` |
+| `Shell/Public/Verb-Noun.ps1` | `Shell/Tests/Verb-Noun.Tests.ps1` |
+| `Public/Verb-Noun.ps1` | `Shell/Tests/Verb-Noun.Tests.ps1` |
 
 ### Step 3 — Determine Mock Requirements
 

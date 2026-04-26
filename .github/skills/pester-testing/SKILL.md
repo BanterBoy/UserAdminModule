@@ -1,7 +1,7 @@
 ---
 name: pester-testing
 description: >
-  Generate Pester tests and CI workflows for PowerShell functions in the RDGScripts repository.
+  Generate Pester tests and CI workflows for PowerShell functions in the UserAdminModule repository.
   USE FOR: creating Pester test files for new or existing functions, scaffolding test fixtures,
   mocking Active Directory or Microsoft Graph API calls, generating GitHub Actions CI workflows,
   setting up PSScriptAnalyzer integration, backfilling tests for critical scripts, creating
@@ -15,7 +15,7 @@ description: >
 
 ## Purpose
 
-Generate high-quality Pester v5+ tests for PowerShell functions in the RDGScripts repository, following established patterns and repo conventions. Also scaffolds GitHub Actions workflows for automated testing and static analysis.
+Generate high-quality Pester v5+ tests for PowerShell functions in the UserAdminModule repository, following established patterns and repo conventions. Also scaffolds GitHub Actions workflows for automated testing and static analysis.
 
 ## When This Skill Applies
 
@@ -33,19 +33,17 @@ Activate when the user:
 
 | Property | Value |
 |---|---|
-| **Current test coverage** | ~0.2% (2 Pester test files across ~1,209 scripts) |
+| **Current test coverage** | 1 test file — `Shell/Tests/Invoke-UserAdminModuleRequiredModules.Tests.ps1` |
 | **Pester version** | v5+ (modern syntax) |
 | **Test file naming** | `<FunctionName>.Tests.ps1` |
-| **CI status** | No GitHub Actions workflows configured |
+| **CI status** | PSGallery publish workflow configured — Pester CI not yet added |
 | **Analyser** | PSScriptAnalyzer referenced in AGENTS.md but not enforced |
 
 ### Existing Test Files (Reference)
 
 | File | Pattern | Complexity |
 |---|---|---|
-| `Functions/Check MFA Status.Test.ps1` | Dot-source import, simple mocks, `Should -Be` | Basic |
-| `ISAM-Manager/Tests/Export-EntraGraphSSOAppConfigAll.Tests.ps1` | Script path import, Graph API mocking, TestDrive, `BeforeAll`/`BeforeEach` | Advanced |
-| `Scripts/Send-MailGunMessage.Tests.ps1` | Manual test case comments (not executable) | Incomplete |
+| `Shell/Tests/Invoke-UserAdminModuleRequiredModules.Tests.ps1` | Dot-source import, module mocks, `BeforeAll`/`BeforeEach` | Intermediate |
 
 ---
 
@@ -63,10 +61,8 @@ User asks to write tests for a specific function or script.
 
    | Function Location | Test File Location |
    |---|---|
-   | `UserAdminModule/<Submodule>/Public/Verb-Noun.ps1` | `UserAdminModule/<Submodule>/Tests/Verb-Noun.Tests.ps1` |
-   | `Functions/FunctionName.ps1` | `Functions/FunctionName.Tests.ps1` |
-   | `Scripts/ScriptName.ps1` | `Scripts/ScriptName.Tests.ps1` |
-   | `<Scenario>/ScriptName.ps1` | `<Scenario>/Tests/ScriptName.Tests.ps1` |
+   | `Shell/Public/Verb-Noun.ps1` | `Shell/Tests/Verb-Noun.Tests.ps1` |
+   | `Public/Verb-Noun.ps1` | `Shell/Tests/Verb-Noun.Tests.ps1` |
 
 3. **Identify what needs mocking** — Common mock targets:
 
@@ -287,10 +283,10 @@ name: PowerShell CI
 
 on:
   push:
-    branches: [prod]
+    branches: [main]
     paths: ['**/*.ps1', '**/*.psm1', '**/*.psd1']
   pull_request:
-    branches: [prod]
+    branches: [main]
     paths: ['**/*.ps1', '**/*.psm1', '**/*.psd1']
 
 jobs:
@@ -326,10 +322,7 @@ jobs:
           Install-Module -Name Pester -Force -Scope CurrentUser -MinimumVersion 5.0.0
           $config = New-PesterConfiguration
           $config.Run.Path = @(
-            'Functions/*.Tests.ps1',
-            'Scripts/*.Tests.ps1',
-            'ISAM-Manager/Tests/*.Tests.ps1',
-            'UserAdminModule/*/Tests/*.Tests.ps1'
+            'Shell/Tests/*.Tests.ps1'
           )
           $config.Output.Verbosity = 'Detailed'
           $config.TestResult.Enabled = $true
