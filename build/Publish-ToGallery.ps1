@@ -6,10 +6,13 @@
 .DESCRIPTION
     Creates a clean staging copy of the module (excluding build tools, CI config,
     and generated artefacts) and publishes it to the PowerShell Gallery using
-    Publish-Module. Supports prerelease publishing automatically when the module
-    manifest contains a Prerelease string.
+    Publish-PSResource (Microsoft.PowerShell.PSResourceGet). PSResourceGet does not
+    use dotnet pack internally and is the modern, reliable replacement for the
+    broken Publish-Module / PowerShellGet v2 publish path.
 
-    Reference: https://learn.microsoft.com/en-us/powershell/module/powershellget/publish-module
+    PSResourceGet is installed automatically if not present.
+
+    Reference: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.psresourceget/publish-psresource
 
 .PARAMETER ApiKey
     Your PowerShell Gallery NuGet API key. Create one at:
@@ -51,13 +54,13 @@
 
 .NOTES
     Author:    Luke Leigh
-    Requires:  PowerShellGet 2.0+ (Install-Module PowerShellGet -Force)
+    Requires:  Microsoft.PowerShell.PSResourceGet (installed automatically if missing)
     Tested on: PowerShell 5.1 and 7+
 
-    Reference: https://learn.microsoft.com/en-us/powershell/module/powershellget/publish-module
+    Reference: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.psresourceget/publish-psresource
 
 .LINK
-    Publish-Module
+    Publish-PSResource
     Test-ModuleManifest
 #>
 [CmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'Publish')]
@@ -78,6 +81,16 @@ trap {
     Write-Error "Publish-ToGallery failed: $_"
     break
 }
+
+# ── Ensure PSResourceGet is available ─────────────────────────────────────────
+# PSResourceGet (Publish-PSResource) does not use dotnet pack internally,
+# avoiding the PowerShellGet v2 bug where dotnet.exe pack fails with exit
+# code -2147450735 on newer .NET SDKs.
+if (-not (Get-Module -Name Microsoft.PowerShell.PSResourceGet -ListAvailable)) {
+    Write-Information 'Microsoft.PowerShell.PSResourceGet not found — installing...' -InformationAction Continue
+    Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force -AllowClobber -Scope CurrentUser
+}
+Import-Module -Name Microsoft.PowerShell.PSResourceGet -ErrorAction Stop
 
 # ── Resolve paths ─────────────────────────────────────────────────────────────
 $repoRoot     = Split-Path $PSScriptRoot -Parent
@@ -226,15 +239,14 @@ if ($Validate) {
 # ── Publish ───────────────────────────────────────────────────────────────────
 $publishParams = @{
     Path        = $stagingPath
-    NuGetApiKey = $ApiKey
+    ApiKey      = $ApiKey
     Repository  = $Repository
     ErrorAction = 'Stop'
-    Verbose     = $PSBoundParameters.ContainsKey('Verbose')
 }
 if ($PSCmdlet.ShouldProcess("UserAdminModule v$($fullVersion)", "Publish to $($Repository)")) {
     Write-Information "Publishing UserAdminModule v$($fullVersion) to $($Repository)..." -InformationAction Continue
-    Publish-Module @publishParams
-    Write-Information "Published successfully. View at: https://www.powershellgallery.com/packages/UserAdminModule" -InformationAction Continue
+    Publish-PSResource @publishParams
+    Write-Information 'Published successfully. View at: https://www.powershellgallery.com/packages/UserAdminModule' -InformationAction Continue
 }
 
 # ── Cleanup ───────────────────────────────────────────────────────────────────

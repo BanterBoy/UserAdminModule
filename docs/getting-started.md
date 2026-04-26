@@ -103,11 +103,15 @@ Invoke-PersonalModulesMenu
 Open-ModuleMenuApp
 ```
 
-The browser is built from `FunctionIndex.json`. Regenerate it after adding or removing functions:
+The browser is built from `FunctionIndex.json`. Use `-Regenerate` to rebuild it after adding or removing functions:
 
 ```powershell
-Invoke-FunctionIndexRegeneration
+# Rebuilds the function index AND the HTML browser, then opens it
+Open-ModuleMenuApp -Regenerate
 ```
+
+{: .tip }
+> `-Regenerate` handles everything automatically — it runs `Invoke-FunctionIndexRegeneration` if needed, then regenerates the HTML browser. You do not need to run any intermediate commands.
 
 ---
 

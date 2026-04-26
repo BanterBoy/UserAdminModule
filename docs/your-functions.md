@@ -127,17 +127,22 @@ Here is a representative sample of the kinds of functions an administrator would
 
 ## Browsing and Indexing Your Library
 
-After setting up your library, generate the function index and open the browser:
+After setting up your library, open the HTML browser:
 
 ```powershell
-# Regenerate FunctionIndex.json and FunctionIndex.md from your functions' comment-based help
-Invoke-FunctionIndexRegeneration
-
-# Open the searchable HTML browser
-Open-ModuleMenuApp
+# Rebuild the function index and HTML browser, then open it
+Open-ModuleMenuApp -Regenerate
 ```
 
-The browser shows synopsis, parameters, examples, and notes for every function — pulled directly from comment-based help. Run `Invoke-FunctionIndexRegeneration` after adding or removing functions to keep it current.
+`-Regenerate` runs `Invoke-FunctionIndexRegeneration` automatically if the index does not exist, then rebuilds the HTML browser from scratch. Run it whenever you add or remove functions.
+
+To rebuild the index separately without opening the browser:
+
+```powershell
+Invoke-FunctionIndexRegeneration
+```
+
+The browser shows synopsis, parameters, examples, and notes for every function — pulled directly from comment-based help.
 
 ---
 

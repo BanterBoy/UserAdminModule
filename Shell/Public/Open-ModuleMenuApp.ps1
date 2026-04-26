@@ -16,8 +16,9 @@ function Open-ModuleMenuApp {
         New-ModuleMenuApp.ps1 in the same resources folder.
 
     .PARAMETER Regenerate
-        If specified, runs New-ModuleMenuApp.ps1 to regenerate the HTML app from the current
-        FunctionIndex.json before opening it. Useful after adding new functions to the module.
+        If specified, ensures FunctionIndex.json is current (running Invoke-FunctionIndexRegeneration
+        automatically if it does not exist), then regenerates the HTML app from FunctionIndex.json
+        before opening it. Use this after adding or removing functions from your library.
 
     .EXAMPLE
         Open-ModuleMenuApp
@@ -70,6 +71,16 @@ function Open-ModuleMenuApp {
                 Write-Error "Generator script not found at $($genScript). Cannot regenerate."
                 return
             }
+
+            # Ensure FunctionIndex.json is current before generating the HTML.
+            # If it does not exist in the module root, regenerate it first so
+            # New-ModuleMenuApp.ps1 has valid input to work from.
+            $indexPath = Join-Path $moduleRoot 'FunctionIndex.json'
+            if (-not (Test-Path $indexPath)) {
+                Write-Verbose "FunctionIndex.json not found — running Invoke-FunctionIndexRegeneration first"
+                Invoke-FunctionIndexRegeneration
+            }
+
             Write-Verbose "Regenerating ModuleMenuApp from $($genScript)"
             & $genScript
         }
