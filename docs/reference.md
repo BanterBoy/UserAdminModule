@@ -69,13 +69,32 @@ Initialize-UserAdminModule -Path 'C:\MyModules\AdminFunctions' -UpdateProfile
 
 ### Invoke-PersonalModulesMenu
 
-Launches an interactive PSMenu interface for selecting and importing categories. Navigate with arrow keys, Space to select, Enter to confirm. All available categories are discovered at runtime.
+Launches an interactive multi-select terminal menu for choosing and importing categories. Navigate with arrow keys, **Space** to select/deselect, **Enter** to confirm. All available categories are discovered dynamically at runtime — no reconfiguration needed when new submodules are added.
 
 ```powershell
-Invoke-PersonalModulesMenu [-Verbose]
+Invoke-PersonalModulesMenu [-ShowDescriptions] [-Verbose]
 ```
 
-No positional parameters. Accepts common parameters (`-Verbose`, `-Debug`).
+| Parameter | Type | Description |
+|---|---|---|
+| `-ShowDescriptions` | Switch | Appends a short description to each category name in the menu, as shown below. |
+
+**Examples:**
+
+```powershell
+# Basic menu — category names only
+Invoke-PersonalModulesMenu
+
+# Menu with descriptions for each category
+Invoke-PersonalModulesMenu -ShowDescriptions
+```
+
+![Invoke-PersonalModulesMenu -ShowDescriptions](images/invokePersonalpsMenu.png)
+
+The menu lists every discovered category from both the module root and your configured `CustomModulesPath`. Select one or more categories, press **Enter**, and they are imported into the current session.
+
+{: .note }
+> `Invoke-PersonalModulesMenu` requires the **PSMenu** module. If it is not installed, the function exits with a warning and the install command: `Install-Module PSMenu`
 
 ---
 
@@ -118,13 +137,54 @@ New-PSM1Module -folderPath 'C:\MyModules\ADFunctions'
 
 These functions are loaded into the **global** scope when `Import-Module UserAdminModule` runs. They provide prompt, console, and session UX helpers — available immediately without importing any category.
 
+---
+
+### Open-ModuleMenuApp
+
+Opens the UserAdminModule Function Reference browser — a self-contained HTML app — in your default browser. The app shows all exported functions across all discovered submodules, with a searchable left-hand category panel and full comment-based help on the right.
+
+```powershell
+Open-ModuleMenuApp [-Regenerate]
+
+# Short alias
+omma
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `-Regenerate` | Switch | Ensures `FunctionIndex.json` is up to date (calling `Invoke-FunctionIndexRegeneration` automatically if needed), then rebuilds `ModuleMenuApp.html` before opening it. Use this after adding or removing functions. |
+
+**Examples:**
+
+```powershell
+# Open the existing HTML browser
+Open-ModuleMenuApp
+
+# Rebuild the index and HTML, then open
+Open-ModuleMenuApp -Regenerate
+
+# Same, using the alias
+omma -Regenerate
+```
+
+![UserAdminModule Function Reference browser](images/menuApp.png)
+
+The browser shows a **live count of all functions** across your submodules, a **DOC COVERAGE** indicator per category, and a **Search functions** field that filters across all names and descriptions in real time.
+
+Click **Get Started** in the top-right corner for a step-by-step setup guide:
+
+![Getting Started modal](images/menuAppGetStart.png)
+
+---
+
+### Other Shell UX Functions
+
 | Function | Description |
 |---|---|
 | `Set-PromptisAdmin` | Sets the PowerShell prompt to display elevation status |
 | `Show-IsAdminOrNot` | Displays whether the current session is running as administrator |
-| `Set-DisplayIsAdmin` | Configures an admin indicator in the window title |
+| `Set-TitleisAdmin` | Sets the console window title to show username, privilege level, and current path |
 | `New-Greeting` | Displays a time-of-day greeting with system info on profile load |
-| `Open-ModuleMenuApp` | Opens the HTML function browser in the default browser. Pass `-Regenerate` to rebuild the index and HTML before opening — handles `Invoke-FunctionIndexRegeneration` automatically if needed |
 | `Get-ConsoleConfig` | Returns current console font, size, and colour configuration |
 | `Set-ConsoleConfig` | Applies console font, size, and colour settings |
 | `Set-Home` | Sets the working directory to the user's home folder |
@@ -135,7 +195,7 @@ These functions are loaded into the **global** scope when `Import-Module UserAdm
 | `Install-ModuleIfNotPresent` | Installs a module only if it is not already available |
 | `Invoke-UserAdminModuleRequiredModules` | Bootstraps all UserAdminModule dependencies |
 | `Initialize-Module` | Internal module initialisation helper |
-| `IsAdmin` | Returns `$true` if the current session is running as administrator |
+| `Test-IsAdmin` | Returns `$true` if the current session is running as administrator, `$false` otherwise |
 
 ---
 

@@ -5,6 +5,10 @@
     Reads FunctionIndex.json and each Public function .ps1 file to extract comment-based help,
     then produces a single self-contained HTML file (ModuleMenuApp.html) with an interactive
     two-panel UI: expandable submodule categories on the left, function detail on the right.
+
+    This script is invoked internally by Open-ModuleMenuApp -Regenerate and is not intended
+    to be called directly by users. Run Invoke-FunctionIndexRegeneration first if FunctionIndex.json
+    is missing or out of date.
 .PARAMETER OutputPath
     Path for the generated HTML file. Defaults to the same folder as this script.
 .EXAMPLE

@@ -1,22 +1,35 @@
-<#
-.SYNOPSIS
-    Writes whether the current user has local administrator privileges.
-.DESCRIPTION
-    Invokes Test-IsAdmin and outputs a warning-level message based on the result.
-    Assumes Test-IsAdmin exists in the current session or module path.
-.EXAMPLE
-    Show-IsAdminOrNot
-.NOTES
-    Output is written via Write-Warning.
-.LINK
-    https://learn.microsoft.com/powershell/scripting/developer/cmdlet/about-cmdlet-binding
-#>
 function Show-IsAdminOrNot {
-    $IsAdmin = Test-IsAdmin
-    if ( $IsAdmin -eq "False") {
-        Write-Warning -Message "Admin Privileges!"
+    <#
+    .SYNOPSIS
+        Writes whether the current PowerShell session is running with administrator privileges.
+    .DESCRIPTION
+        Calls Test-IsAdmin and emits a Write-Warning message indicating the privilege level.
+        Use this in profile scripts or interactive sessions for a quick elevation check.
+    .EXAMPLE
+        Show-IsAdminOrNot
+        WARNING: Running with Admin Privileges
+    .EXAMPLE
+        Show-IsAdminOrNot
+        WARNING: Running with User Privileges
+    .NOTES
+        Author:    Luke Leigh
+        Tested on: PowerShell 5.1 and 7+
+    .LINK
+        Test-IsAdmin
+        Set-PromptisAdmin
+    #>
+    [CmdletBinding()]
+    param()
+
+    trap {
+        Write-Error "Show-IsAdminOrNot failed: $_"
+        break
+    }
+
+    if (Test-IsAdmin) {
+        Write-Warning -Message 'Running with Admin Privileges'
     }
     else {
-        Write-Warning -Message "User Privileges"
+        Write-Warning -Message 'Running with User Privileges'
     }
 }

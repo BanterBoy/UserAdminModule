@@ -47,8 +47,12 @@ Import-PersonalModules -Category Exchange
 **Or browse and select interactively:**
 
 ```powershell
-Invoke-PersonalModulesMenu
+Invoke-PersonalModulesMenu -ShowDescriptions
 ```
+
+![Invoke-PersonalModulesMenu -ShowDescriptions showing all discovered categories](images/invokePersonalpsMenu.png)
+
+Select one or more categories with **Space**, then press **Enter** to import them all at once.
 
 ---
 
