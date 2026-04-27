@@ -43,21 +43,19 @@ Quick start:
             ProjectUri   = 'https://useradminmodule.lukeleigh.com/'
             LicenseUri   = 'https://github.com/BanterBoy/UserAdminModule/blob/main/LICENSE'
             ReleaseNotes = @'
-v1.0.6 — Fix -UseSharedProfile: dynamic resolution block instead of hardcoded path
+v1.0.6 — Fix -UseSharedProfile profile write (root cause: Add-Content silent failure)
   - Root cause of v1.0.5 bug: (Get-Module UserAdminModule).ModuleBase returned an
-    array when multiple module instances were loaded (dev + PSGallery), producing
-    a two-path concatenated string that failed as a dot-source argument
-  - New approach: -UseSharedProfile now writes a self-contained resolution block to
-    $PROFILE that calls Get-Module -ListAvailable at each session startup, sorts by
-    version descending and picks the newest installed copy. Immune to multi-instance,
-    version upgrades, reinstalls, and cross-machine portability issues
-  - $PSEdition detection still controls which filename is embedded in the block:
-    Desktop (PS 5.1) -> SharedWindowsPowershellProfile.ps1
-    Core   (PS 7+)   -> SharedPowershellProfile.ps1
-  - Block cleans up its own temporary variables with Remove-Variable
-  - Updated profiles/Microsoft.PowerShell_profile.ps1 OPTION B documentation
-  - Updated docs/getting-started.md Profile options section
-  - Updated docs/reference.md -UseSharedProfile parameter description
+    array when two module instances were loaded, producing a concatenated path string
+  - Root cause of profile write failure: Add-Content silently swallowed errors then
+    set ProfileUpdated=True regardless — profile was empty after the run
+  - Fix 1: resolve shared profile path via $Script:UAMModuleRoot (set in psm1 at
+    load time — always a single string, immune to multi-instance loading)
+  - Fix 2: store resolved path in config.json as SharedProfilePath
+  - Fix 3: profile block reads config.json at session startup (no PSModulePath needed)
+  - Fix 4: replaced Add-Content with [System.IO.File]::WriteAllText + explicit
+    read-back verification. If verification fails, backup is restored and a Warning
+    is emitted instead of silently returning ProfileUpdated=True
+  - Tested end-to-end in a real admin session — profile correctly written and verified
 v1.0.5 — Add -UseSharedProfile to Initialize-UserAdminModule
   - New -UseSharedProfile switch: when combined with -UpdateProfile, writes a
     dot-source line for the bundled shared profile instead of a bare Import-Module
