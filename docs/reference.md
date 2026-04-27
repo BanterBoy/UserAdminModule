@@ -1,18 +1,12 @@
 ---
-layout: default
+layout: single
 title: Framework Reference
 nav_order: 4
 description: "Complete command reference for all UserAdminModule framework and Shell UX functions."
+toc: true
 ---
 
 # Framework Reference
-{: .no_toc }
-
-## Table of contents
-{: .no_toc .text-delta }
-
-1. TOC
-{:toc}
 
 ---
 
@@ -93,8 +87,7 @@ Invoke-PersonalModulesMenu -ShowDescriptions
 
 The menu lists every discovered category from both the module root and your configured `CustomModulesPath`. Select one or more categories, press **Enter**, and they are imported into the current session.
 
-{: .note }
-> `Invoke-PersonalModulesMenu` requires the **PSMenu** module. If it is not installed, the function exits with a warning and the install command: `Install-Module PSMenu`
+> **Note:** `Invoke-PersonalModulesMenu` requires the **PSMenu** module. If it is not installed, the function exits with a warning and the install command: `Install-Module PSMenu`
 
 ---
 
@@ -108,8 +101,7 @@ Invoke-FunctionIndexRegeneration [-Verbose]
 
 Run this after adding or removing functions. You can also trigger this automatically via `Open-ModuleMenuApp -Regenerate`, which calls it if the index does not exist.
 
-{: .important }
-> `FunctionIndex.json` and `FunctionIndex.md` are auto-generated. Do not edit them manually — changes will be overwritten on the next regeneration.
+> **Important:** `FunctionIndex.json` and `FunctionIndex.md` are auto-generated. Do not edit them manually — changes will be overwritten on the next regeneration.
 
 ---
 
@@ -209,8 +201,7 @@ $env:APPDATA\UserAdminModule\config.json
 
 The configuration file is created by `Initialize-UserAdminModule`. Its primary key is `CustomModulesPath`, which tells all discovery functions where to scan for your category folders.
 
-{: .warning }
-> Do not edit `config.json` directly. Re-run `Initialize-UserAdminModule -Path <newpath>` to change the configured path.
+> **Warning:** Do not edit `config.json` directly. Re-run `Initialize-UserAdminModule -Path <newpath>` to change the configured path.
 
 ---
 
