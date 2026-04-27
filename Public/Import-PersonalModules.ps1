@@ -161,7 +161,7 @@ function Import-PersonalModules {
             if ($PSCmdlet.ShouldProcess($modulePath, 'Import-Module')) {
                 $start = Get-Date
                 Write-Verbose "Importing '$($cat)' from: $($modulePath)"
-                Import-Module -Name $modulePath -Force -DisableNameChecking -ErrorAction SilentlyContinue
+                Import-Module -Name $modulePath -Force -DisableNameChecking -Global
                 $duration      = (Get-Date) - $start
                 $timingResults += [PSCustomObject]@{
                     Category = $cat

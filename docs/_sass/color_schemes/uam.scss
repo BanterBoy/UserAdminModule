@@ -1,0 +1,39 @@
+// UAM — custom just-the-docs colour scheme
+// Mirrors the visual identity of resources/ModuleMenuApp.html
+// Built on top of the upstream dark scheme.
+
+@import "./color_schemes/dark";
+
+// ── HTML app CSS variable equivalents ──────────────────────────────────────
+//   --bg-deep:    #0d1117   main page background
+//   --bg-panel:   #161b22   sidebar / header / search bar
+//   --bg-card:    #1c2128   code blocks, tables
+//   --accent:     #58a6ff   links, headings, active items
+//   --accent2:    #3fb950   section sub-headings (used in custom.scss)
+//   --accent3:    #d2a8ff   inline code tint
+//   --text:       #e6edf3   body text
+//   --text-muted: #8b949e   muted / nav child links
+//   --border:     #30363d   borders
+
+// ── Backgrounds ────────────────────────────────────────────────────────────
+$body-background-color:  #0d1117;   // --bg-deep
+$sidebar-color:          #161b22;   // --bg-panel
+$feedback-color:         #1c2128;   // --bg-card  (search results / hover)
+$code-background-color:  #1c2128;   // --bg-card
+$table-background-color: #161b22;   // --bg-panel
+$search-background-color: #161b22;  // --bg-panel
+
+// ── Text ───────────────────────────────────────────────────────────────────
+$body-text-color:             #e6edf3;  // --text
+$body-heading-color:          #58a6ff;  // --accent  (h1–h6 default)
+$nav-child-link-color:        #8b949e;  // --text-muted
+$search-result-preview-color: #8b949e;  // --text-muted
+$code-linenumber-color:       #8b949e;  // --text-muted
+
+// ── Accent / interactive ────────────────────────────────────────────────────
+$link-color:        #58a6ff;  // --accent
+$btn-primary-color: #1f3a5f;  // --bg-active  (primary button fill)
+$base-button-color: #1c2128;  // --bg-card    (default button fill)
+
+// ── Borders ────────────────────────────────────────────────────────────────
+$border-color: #30363d;  // --border

@@ -27,7 +27,7 @@ description: "Install and configure UserAdminModule in five minutes."
 ## Install from PSGallery
 
 ```powershell
-Install-Module UserAdminModule -AllowPrerelease -Scope CurrentUser
+Install-Module UserAdminModule -Scope CurrentUser
 ```
 
 {: .note }
@@ -37,13 +37,23 @@ Install-Module UserAdminModule -AllowPrerelease -Scope CurrentUser
 
 ## First-time setup
 
-Run `Initialize-UserAdminModule` once, pointing it at the root of your function library. Pass `-UpdateProfile` to have it add the import line to your `$PROFILE` automatically.
+Run `Initialize-UserAdminModule` once, pointing it at the root of your function library.
+
+**Option A — minimal setup** (adds `Import-Module UserAdminModule` to your `$PROFILE`):
 
 ```powershell
 Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile
 ```
 
-This writes a `config.json` to `$env:APPDATA\UserAdminModule\` so every UserAdminModule command knows where to find your functions. You only need to run this once per machine.
+**Option B — full shell UX** (admin-coloured prompt, greeting, PSReadLine history — recommended):
+
+```powershell
+Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile -UseSharedProfile
+```
+
+`-UseSharedProfile` automatically picks the right bundled profile for your PowerShell edition: `SharedPowershellProfile.ps1` for PS 7+ or `SharedWindowsPowershellProfile.ps1` for PS 5.1.
+
+Both options write `config.json` to `$env:APPDATA\UserAdminModule\` and make a `.bak` backup of your existing `$PROFILE` first. You only need to run this once per machine.
 
 {: .tip }
 > If you already have functions in a folder like `C:\Scripts\AdminFunctions`, point `-Path` there. No restructuring needed yet — see [Bring Your Own Functions]({{ site.baseurl }}/your-functions) for how to make existing libraries compatible.

@@ -72,7 +72,7 @@ Export-ModuleMember -Function $Public.BaseName
 UserAdminModule includes `New-PSM1Module` to scaffold a new category folder with the correct structure:
 
 ```powershell
-New-PSM1Module -Name ADFunctions -Path 'C:\MyModules'
+New-PSM1Module -folderPath 'C:\MyModules\ADFunctions'
 ```
 
 This creates:
@@ -80,8 +80,11 @@ This creates:
 ```
 C:\MyModules\ADFunctions\
 ├── ADFunctions.psm1
-└── Public\
-    └── .gitkeep
+├── Public\
+├── Private\
+├── Classes\
+├── Configuration\
+└── Resources\
 ```
 
 Drop your function `.ps1` files into `Public\` and you're ready to import.

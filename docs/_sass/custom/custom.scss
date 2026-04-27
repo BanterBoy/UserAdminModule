@@ -1,0 +1,103 @@
+// UAM custom CSS overrides
+// Additional visual polish to match resources/ModuleMenuApp.html
+
+// ── Monospace font: match HTML app (Cascadia Code → Consolas fallback) ──────
+code, pre, .highlight {
+  font-family: "Cascadia Code", "Cascadia Mono", Consolas, "SFMono-Regular", monospace !important;
+}
+
+// ── Inline code tint: --accent3 (#d2a8ff) ───────────────────────────────────
+code:not(.highlight code) {
+  color: #d2a8ff;
+  background-color: #1c2128;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+}
+
+// ── Section headings h2: accent2 green underline, matching HTML .section-title
+h2 {
+  color: #3fb950;
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid #30363d;
+}
+
+// h3: keep accent blue but slightly smaller
+h3 {
+  color: #58a6ff;
+}
+
+// ── Nav sidebar: tighter item height, hover state matches --bg-hover ─────────
+.nav-list .nav-list-item .nav-list-link:hover {
+  background-color: #222d3a;
+  color: #e6edf3;
+}
+
+.nav-list .nav-list-item .nav-list-link.active {
+  background-color: #1f3a5f;
+  color: #58a6ff;
+  border-left: 3px solid #58a6ff;
+}
+
+// ── Search input: match HTML app search bar styling ─────────────────────────
+.search-input {
+  background-color: #1c2128;
+  border: 1px solid #30363d;
+  color: #e6edf3;
+  border-radius: 8px;
+
+  &:focus {
+    border-color: #58a6ff;
+    outline: none;
+  }
+}
+
+// ── Tables: card background + muted header row ───────────────────────────────
+table {
+  border: 1px solid #30363d;
+
+  thead {
+    background-color: #1c2128;
+    color: #8b949e;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  tbody tr:nth-child(odd) {
+    background-color: #161b22;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #0d1117;
+  }
+
+  td, th {
+    border-color: #30363d;
+  }
+}
+
+// ── Code blocks: card background, border, radius matching HTML .example-block
+.highlight, pre.highlight {
+  background-color: #1c2128;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+}
+
+// ── Callout / label colours matching HTML accents ───────────────────────────
+.label-blue   { background-color: #1f3a5f; color: #58a6ff; }
+.label-green  { background-color: #1a3a27; color: #3fb950; }
+.label-purple { background-color: #2d1f4a; color: #d2a8ff; }
+
+// ── Site header (top bar): match --bg-panel ──────────────────────────────────
+.site-header {
+  background-color: #161b22;
+  border-bottom: 1px solid #30363d;
+}
+
+// ── Footer ───────────────────────────────────────────────────────────────────
+.site-footer {
+  background-color: #161b22;
+  border-top: 1px solid #30363d;
+  color: #8b949e;
+  font-size: 0.8rem;
+}

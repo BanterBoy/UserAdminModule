@@ -73,8 +73,8 @@ No hardcoded category lists. No `.psd1` maintenance per function. Works on any m
 ### From PowerShell Gallery (Recommended)
 
 ```powershell
-# Install the module (current release is a preview)
-Install-Module UserAdminModule -AllowPrerelease -Scope CurrentUser
+# Install the module
+Install-Module UserAdminModule -Scope CurrentUser
 
 # Option A — Minimal setup (Import-Module only)
 Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile
@@ -200,7 +200,7 @@ The bundled **Shell** submodule adds 16 UX functions including:
 | Function | Description |
 |---|---|
 | `Set-PromptisAdmin` | Colours the prompt red/green based on admin status |
-| `Set-DisplayIsAdmin` | Sets the console window title with username, privilege level, and current path |
+| `Set-TitleisAdmin` | Sets the console window title with username, privilege level, and current path |
 | `Show-IsAdminOrNot` | Writes whether the current session is running as administrator |
 | `Set-ConsoleConfig` | Sets console window and buffer dimensions |
 | `Get-ConsoleConfig` | Retrieves the current console window and buffer sizes |

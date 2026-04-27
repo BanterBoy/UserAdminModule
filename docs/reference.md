@@ -48,21 +48,26 @@ Import-PersonalModules -Category Exchange -Verbose
 
 ### Initialize-UserAdminModule
 
-One-time setup command. Writes `config.json` to `$env:APPDATA\UserAdminModule\` and optionally adds `Import-Module UserAdminModule` to your `$PROFILE`.
+One-time setup command. Writes `config.json` to `$env:APPDATA\UserAdminModule\` and optionally adds a line to your `$PROFILE`.
 
 ```powershell
-Initialize-UserAdminModule -Path <string> [-UpdateProfile] [-Verbose]
+Initialize-UserAdminModule -Path <string> [-UpdateProfile] [-UseSharedProfile] [-Verbose]
 ```
 
 | Parameter | Type | Description |
 |---|---|---|
 | `-Path` | String | Path to your custom modules root folder. Created automatically if it does not exist. |
-| `-UpdateProfile` | Switch | Appends `Import-Module UserAdminModule` to the current `$PROFILE` if the line is not already present. |
+| `-UpdateProfile` | Switch | Writes a line to the current `$PROFILE` (with a `.bak` backup first). |
+| `-UseSharedProfile` | Switch | When combined with `-UpdateProfile`, writes a dot-source line for the bundled shared profile instead of a bare `Import-Module` line. Auto-detects `$PSEdition`: PS 7+ → `SharedPowershellProfile.ps1`; PS 5.1 → `SharedWindowsPowershellProfile.ps1`. |
 
-**Example:**
+**Examples:**
 
 ```powershell
-Initialize-UserAdminModule -Path 'C:\MyModules\AdminFunctions' -UpdateProfile
+# Option A — minimal: Import-Module only
+Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile
+
+# Option B — full shell UX: admin prompt, greeting, PSReadLine (PS edition auto-detected)
+Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile -UseSharedProfile
 ```
 
 ---
