@@ -107,19 +107,54 @@ function Get-ImportedModuleCommand {
             break
         }
 
-        # Known submodule names that Import-PersonalModules can load
-        $knownSubmodules = @(
-            'ADFunctions', 'Azure', 'CertificateUtilities', 'CiscoSecure',
-            'CustomRDGCommands', 'Database', 'EnvironmentManagement', 'Exchange',
-            'FileOperations', 'JekyllBlog', 'Logging', 'MediaManagement',
-            'Network', 'PKICertificateTools', 'PrintManagement',
-            'ProcessServiceSchedules', 'Registry', 'RemoteConnections',
-            'Replication', 'Security', 'Shell', 'ShutdownCommands',
-            'Teams', 'Testing', 'TimeTools', 'Utilities',
-            'Virtualization', 'Weather'
-        )
-
         Write-Verbose 'Retrieving loaded UserAdminModule submodules'
+
+        # Discover UserAdminModule root and custom modules path
+        if (-not $Script:UAMModuleRoot) {
+            Write-Verbose '[DIAG] $Script:UAMModuleRoot was not set. Initializing from $PSScriptRoot.'
+            $Script:UAMModuleRoot = Split-Path $PSScriptRoot -Parent
+        }
+        $_uamRoot = $Script:UAMModuleRoot
+        $cfg = if (Get-Command Get-UserAdminModuleConfig -ErrorAction SilentlyContinue) {
+            Get-UserAdminModuleConfig -ErrorAction SilentlyContinue
+        }
+        $customPath = if ($cfg -and $cfg.CustomModulesPath -and (Test-Path $cfg.CustomModulesPath)) { $cfg.CustomModulesPath } else { $null }
+
+        function Normalize-Path([string]$path) {
+            if (-not $path) { return $null }
+            return ([System.IO.Path]::GetFullPath($path.TrimEnd('\/'))).TrimEnd('\/')
+        }
+        $_uamRoot = Normalize-Path $_uamRoot
+        $customPath = Normalize-Path $customPath
+
+        Write-Verbose "[DIAG] UAMModuleRoot: $_uamRoot"
+        Write-Verbose "[DIAG] CustomModulesPath: $customPath"
+
+        function Test-IsUAMSubmodule($mod) {
+            if (-not $mod.ModuleBase -or -not $mod.Name) { return $false }
+            $psm1 = Join-Path $mod.ModuleBase ("$($mod.Name).psm1")
+            $modBase = Normalize-Path $mod.ModuleBase
+            $hasPsm1 = Test-Path $psm1
+            $inUAMRoot = ($null -ne $_uamRoot -and $modBase.StartsWith($_uamRoot, [System.StringComparison]::OrdinalIgnoreCase))
+            $inCustomPath = ($null -ne $customPath -and $modBase.StartsWith($customPath, [System.StringComparison]::OrdinalIgnoreCase))
+            if ($mod.Name -eq 'CustomShellCommands') {
+                Write-Verbose "[DIAG] --- Checking CustomShellCommands ---"
+                Write-Verbose "[DIAG]   ModuleBase: $modBase"
+                Write-Verbose "[DIAG]   .psm1 exists: $hasPsm1"
+                Write-Verbose "[DIAG]   In UAMRoot: $inUAMRoot"
+                Write-Verbose "[DIAG]   In CustomPath: $inCustomPath"
+            }
+            if (-not $hasPsm1) { return $false }
+            return ($inUAMRoot -or $inCustomPath)
+        }
+
+        $loadedModules = Get-Module |
+            Where-Object {
+                if ($_.Name -eq 'CustomShellCommands') {
+                    Write-Verbose "[DIAG] Found loaded module: $($_.Name) at $($_.ModuleBase)"
+                }
+                Test-IsUAMSubmodule $_ -and $_.Name -like $Submodule
+            }
     }
 
     process {
@@ -128,9 +163,6 @@ function Get-ImportedModuleCommand {
             continue
         }
 
-        # Get currently loaded modules that match known submodule names
-        $loadedModules = Get-Module |
-            Where-Object { $_.Name -in $knownSubmodules -and $_.Name -like $Submodule }
 
         if (-not $loadedModules) {
             Write-Warning "No UserAdminModule submodules matching '$Submodule' are currently loaded. Run Import-PersonalModules first."
