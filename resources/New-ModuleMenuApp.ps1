@@ -510,42 +510,34 @@ $htmlTemplate = @'
       <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin-bottom:10px;">Step 1 — Prerequisites</div>
       <ul style="margin:0;padding-left:20px;color:var(--text);font-size:0.88rem;line-height:1.9;">
         <li>PowerShell <strong>5.1</strong> (Windows) or <strong>7+</strong> (cross-platform)</li>
-        <li><strong>Git</strong> installed — <a href="https://git-scm.com/downloads" target="_blank" style="color:var(--accent);">git-scm.com</a></li>
-        <li>A local folder for your repos, e.g. <code style="background:var(--bg-active);padding:1px 6px;border-radius:3px;">C:\GitRepos\</code></li>
+        <li>A folder for your personal functions, e.g. <code style="background:var(--bg-active);padding:1px 6px;border-radius:3px;">C:\MyModules\</code></li>
       </ul>
     </div>
 
     <!-- Step 2 -->
     <div style="margin-bottom:24px;">
-      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin-bottom:10px;">Step 2 — Clone the Repository</div>
-      <div style="font-size:0.85rem;color:var(--text);margin-bottom:8px;">Open a terminal and run:</div>
-      <pre style="background:var(--bg-active);border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:0.82rem;color:var(--accent);overflow-x:auto;margin:0;">git clone https://github.com/BanterBoy/RDGScripts.git C:\GitRepos\RDGScripts</pre>
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin-bottom:10px;">Step 2 — Install from PSGallery</div>
+      <div style="font-size:0.85rem;color:var(--text);margin-bottom:8px;">Open PowerShell and run:</div>
+      <pre style="background:var(--bg-active);border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:0.82rem;color:var(--accent);overflow-x:auto;margin:0;">Install-Module UserAdminModule</pre>
     </div>
 
     <!-- Step 3 -->
     <div style="margin-bottom:24px;">
-      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin-bottom:10px;">Step 3 — Check / Create Your Profile</div>
-      <div style="font-size:0.85rem;color:var(--text);margin-bottom:8px;">Check whether a profile file already exists:</div>
-      <pre style="background:var(--bg-active);border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:0.82rem;color:var(--accent);overflow-x:auto;margin:0 0 10px 0;">Test-Path $PROFILE</pre>
-      <div style="font-size:0.85rem;color:var(--text);margin-bottom:8px;">If it returns <code style="background:var(--bg-active);padding:1px 6px;border-radius:3px;">False</code>, create it:</div>
-      <pre style="background:var(--bg-active);border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:0.82rem;color:var(--accent);overflow-x:auto;margin:0;">New-Item -ItemType File -Path $PROFILE -Force</pre>
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin-bottom:10px;">Step 3 — Initialise the Module</div>
+      <div style="font-size:0.85rem;color:var(--text);margin-bottom:8px;">Tell the module where your personal functions live:</div>
+      <pre style="background:var(--bg-active);border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:0.82rem;color:var(--accent);overflow-x:auto;margin:0 0 10px 0;">Initialize-UserAdminModule -Path 'C:\MyModules'</pre>
+      <div style="font-size:0.82rem;color:var(--text-muted);">This saves your modules path to <code style="background:var(--bg-active);padding:1px 6px;border-radius:3px;">$env:APPDATA\UserAdminModule\config.json</code>.</div>
     </div>
 
     <!-- Step 4 -->
     <div style="margin-bottom:24px;">
-      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin-bottom:10px;">Step 4 — Configure Your Profile</div>
-      <div style="font-size:0.85rem;color:var(--text);margin-bottom:8px;">Add the appropriate dot-source line to your <code style="background:var(--bg-active);padding:1px 6px;border-radius:3px;">$PROFILE</code>:</div>
-
-      <div style="font-size:0.78rem;color:var(--text-muted);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.04em;">PowerShell 7+ (pwsh)</div>
-      <pre style="background:var(--bg-active);border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:0.82rem;color:var(--accent);overflow-x:auto;margin:0 0 14px 0;"># Add to your $PROFILE
-. C:\GitRepos\RDGScripts\SharedPowershellProfle.ps1</pre>
-
-      <div style="font-size:0.78rem;color:var(--text-muted);margin:0 0 4px;text-transform:uppercase;letter-spacing:.04em;">Windows PowerShell 5.1</div>
-      <pre style="background:var(--bg-active);border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:0.82rem;color:var(--accent);overflow-x:auto;margin:0;">. C:\GitRepos\RDGScripts\SharedWindowsPowershellProfle.ps1</pre>
-
-      <div style="margin-top:12px;font-size:0.82rem;color:var(--text-muted);">
-        To open your profile in Notepad for editing, run: <code style="background:var(--bg-active);padding:1px 6px;border-radius:3px;color:var(--accent);">notepad $PROFILE</code>
-      </div>
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin-bottom:10px;">Step 4 — Add to Your Profile</div>
+      <div style="font-size:0.85rem;color:var(--text);margin-bottom:8px;">Open your profile for editing:</div>
+      <pre style="background:var(--bg-active);border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:0.82rem;color:var(--accent);overflow-x:auto;margin:0 0 12px 0;">notepad $PROFILE</pre>
+      <div style="font-size:0.85rem;color:var(--text);margin-bottom:8px;">Add the following line:</div>
+      <pre style="background:var(--bg-active);border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:0.82rem;color:var(--accent);overflow-x:auto;margin:0 0 12px 0;">Import-Module UserAdminModule</pre>
+      <div style="font-size:0.85rem;color:var(--text);margin-bottom:8px;">Optionally, auto-import a category on startup:</div>
+      <pre style="background:var(--bg-active);border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:0.82rem;color:var(--accent);overflow-x:auto;margin:0;">Import-PersonalModules -Category ADFunctions</pre>
     </div>
 
     <!-- Step 5 -->
