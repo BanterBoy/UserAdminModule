@@ -1,6 +1,6 @@
 @{
     RootModule        = 'UserAdminModule.psm1'
-    ModuleVersion     = '1.0.3'
+    ModuleVersion     = '1.0.4'
     GUID              = 'c080b18e-78ca-453a-8f6b-6a86c9390267'
     Author            = 'Luke Leigh'
     CompanyName       = 'Banter Studio'
@@ -43,6 +43,19 @@ Quick start:
             ProjectUri   = 'https://useradminmodule.lukeleigh.com/'
             LicenseUri   = 'https://github.com/BanterBoy/UserAdminModule/blob/main/LICENSE'
             ReleaseNotes = @'
+v1.0.4 — Fix submodule import and command detection (PSGallery regression, re-release)
+  - 1.0.3 published with incomplete fixes; this supersedes it
+  - Import-PersonalModules: added -Global to Import-Module so imported submodules
+    are visible in the user session, not scoped internally to the module
+  - Get-ImportedModuleCommand: rewrote submodule detection using dynamic directory
+    scan (same logic as Import-PersonalModules). Eliminates the broken
+    path-comparison approach that caused Normalize-Path and Test-IsUAMSubmodule
+    to leak into Shell exports and Shell/UserAdminModule to appear as submodules
+  - Get-ImportedModuleCommand: replaced Get-Help synopsis lookup with AST-based
+    help extraction to avoid terminating type-resolution errors on functions that
+    use typed AD parameters ([ADComputer] etc.) when AD module is not loaded
+  - Get-ImportedModuleCommand: deduplicate results when same module is loaded from
+    multiple paths (e.g. PSGallery and local dev copy both in session)
 v1.0.3 — Fix submodule import and command detection (PSGallery regression)
   - Import-PersonalModules: added -Global to Import-Module so imported submodules
     are visible in the user session, not scoped internally to the module
