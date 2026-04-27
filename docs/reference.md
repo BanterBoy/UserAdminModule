@@ -48,21 +48,26 @@ Import-PersonalModules -Category Exchange -Verbose
 
 ### Initialize-UserAdminModule
 
-One-time setup command. Writes `config.json` to `$env:APPDATA\UserAdminModule\` and optionally adds `Import-Module UserAdminModule` to your `$PROFILE`.
+One-time setup command. Writes `config.json` to `$env:APPDATA\UserAdminModule\` and optionally adds a profile line to your `$PROFILE`.
 
 ```powershell
-Initialize-UserAdminModule -Path <string> [-UpdateProfile] [-Verbose]
+Initialize-UserAdminModule -Path <string> [-UpdateProfile] [-UseSharedProfile] [-Verbose]
 ```
 
 | Parameter | Type | Description |
 |---|---|---|
 | `-Path` | String | Path to your custom modules root folder. Created automatically if it does not exist. |
-| `-UpdateProfile` | Switch | Appends `Import-Module UserAdminModule` to the current `$PROFILE` if the line is not already present. |
+| `-UpdateProfile` | Switch | Appends a line to the current `$PROFILE` if not already present. By default, appends `Import-Module UserAdminModule`. Combine with `-UseSharedProfile` to append a dot-source line for the full shell UX instead. |
+| `-UseSharedProfile` | Switch | When combined with `-UpdateProfile`, writes a dot-source line for the bundled `SharedPowershellProfile.ps1` (PS 7+) or `SharedWindowsPowershellProfile.ps1` (PS 5.1) instead of a plain `Import-Module` line. The correct file is chosen automatically based on `$PSEdition`. |
 
-**Example:**
+**Examples:**
 
 ```powershell
+# Minimal setup — Import-Module line only
 Initialize-UserAdminModule -Path 'C:\MyModules\AdminFunctions' -UpdateProfile
+
+# Full shell UX — dot-source the shared profile (auto-detects PS edition)
+Initialize-UserAdminModule -Path 'C:\MyModules\AdminFunctions' -UpdateProfile -UseSharedProfile
 ```
 
 ---

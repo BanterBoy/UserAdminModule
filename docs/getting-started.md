@@ -50,6 +50,53 @@ This writes a `config.json` to `$env:APPDATA\UserAdminModule\` so every UserAdmi
 
 ---
 
+## Profile options
+
+There are two ways to configure your `$PROFILE`. Both use `-UpdateProfile`; they differ in how much shell UX you get.
+
+### Option A — Minimal (Import-Module only)
+
+```powershell
+Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile
+```
+
+Appends this line to `$PROFILE`:
+
+```powershell
+Import-Module UserAdminModule -ErrorAction SilentlyContinue
+```
+
+Use this if you only want the framework functions (`Import-PersonalModules`, `Invoke-PersonalModulesMenu`, etc.) available in every session, without any opinionated console configuration.
+
+### Option B — Full shell UX (shared profile)
+
+```powershell
+Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile -UseSharedProfile
+```
+
+Appends a dot-source line for the bundled shared profile instead of a bare `Import-Module`:
+
+```powershell
+# PS 7+
+. "C:\Users\you\Documents\PowerShell\Modules\UserAdminModule\1.0.5\profiles\SharedPowershellProfile.ps1"
+
+# PS 5.1 / Windows PowerShell
+. "C:\Users\you\...\profiles\SharedWindowsPowershellProfile.ps1"
+```
+
+The correct file is chosen automatically based on `$PSEdition` — you do not need to specify which edition you are running. The shared profile configures:
+
+- Admin-aware prompt with colour coding (`Set-PromptisAdmin`)
+- Console size and colour scheme (`Set-ConsoleConfig`)
+- PSReadLine history-based prediction
+- Startup greeting with uptime counter (`New-Greeting`)
+- Module auto-load and all framework functions
+
+{: .note }
+> A `.bak` backup of your existing `$PROFILE` is created before any change is made.
+
+---
+
 ## Scaffold your first category
 
 `New-PSM1Module` creates the full folder structure for a new category, including the `.psm1` file that auto-dot-sources everything in `Public\`:

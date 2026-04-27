@@ -25,6 +25,14 @@ function Initialize-UserAdminModule {
         PowerShell profile ($PROFILE). A .bak backup of the existing profile is
         created before any change is made.
 
+    .PARAMETER UseSharedProfile
+        When combined with -UpdateProfile, writes a dot-source line for the bundled
+        SharedPowershellProfile.ps1 (PS 7+) or SharedWindowsPowershellProfile.ps1
+        (PS 5.1) instead of a plain Import-Module line. The correct file is chosen
+        automatically based on $PSEdition. The shared profile configures the full
+        shell UX: admin prompt, console sizing, PSReadLine prediction, greeting,
+        and startup timer.
+
     .EXAMPLE
         Initialize-UserAdminModule -Path 'C:\MyModules'
 
@@ -36,6 +44,14 @@ function Initialize-UserAdminModule {
 
         Configures the custom path and adds the Import-Module line to $PROFILE so
         UserAdminModule loads automatically in every new session.
+
+    .EXAMPLE
+        Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile -UseSharedProfile
+
+        Configures the custom path and writes the full shared profile dot-source line
+        to $PROFILE. On PS 7+ this loads SharedPowershellProfile.ps1; on PS 5.1 it
+        loads SharedWindowsPowershellProfile.ps1. Both configure the admin prompt,
+        console sizing, PSReadLine prediction, greeting, and startup timer.
 
     .EXAMPLE
         Initialize-UserAdminModule -Path 'C:\MyModules' -WhatIf
@@ -68,7 +84,10 @@ function Initialize-UserAdminModule {
         [string]$Path,
 
         [Parameter()]
-        [switch]$UpdateProfile
+        [switch]$UpdateProfile,
+
+        [Parameter()]
+        [switch]$UseSharedProfile
     )
 
     begin {
@@ -119,8 +138,29 @@ function Initialize-UserAdminModule {
         $profileUpdated = $false
 
         if ($UpdateProfile) {
-            $importLine  = 'Import-Module UserAdminModule -ErrorAction SilentlyContinue'
             $profilePath = $PROFILE
+
+            # Build the profile line to write
+            if ($UseSharedProfile) {
+                # Pick the correct shared profile based on PS edition.
+                # PS 5.1 = Desktop edition; PS 7+ = Core edition.
+                $_sharedFile = if ($PSEdition -eq 'Desktop') {
+                    'SharedWindowsPowershellProfile.ps1'
+                } else {
+                    'SharedPowershellProfile.ps1'
+                }
+                # Resolve the bundled profile path from the installed module.
+                $_uamBase = (Get-Module UserAdminModule -ErrorAction SilentlyContinue).ModuleBase
+                if (-not $_uamBase) {
+                    $_uamBase = if ($Script:UAMModuleRoot) { $Script:UAMModuleRoot } else { Split-Path $PSScriptRoot -Parent }
+                }
+                $_sharedPath = Join-Path $_uamBase "profiles\$($_sharedFile)"
+                $importLine  = ". `"$($_sharedPath)`""
+                $_matchPattern = 'SharedPowershellProfile|SharedWindowsPowershellProfile'
+            } else {
+                $importLine    = 'Import-Module UserAdminModule -ErrorAction SilentlyContinue'
+                $_matchPattern = 'Import-Module UserAdminModule'
+            }
 
             if (-not (Test-Path $profilePath)) {
                 if ($PSCmdlet.ShouldProcess($profilePath, 'Create PowerShell profile file')) {
@@ -130,20 +170,20 @@ function Initialize-UserAdminModule {
 
             $existingContent = Get-Content -Path $profilePath -Raw -ErrorAction SilentlyContinue
 
-            if ($existingContent -notmatch 'Import-Module UserAdminModule') {
-                if ($PSCmdlet.ShouldProcess($profilePath, 'Add Import-Module line to profile')) {
+            if ($existingContent -notmatch $_matchPattern) {
+                if ($PSCmdlet.ShouldProcess($profilePath, "Add profile line to $($profilePath)")) {
                     $backupPath = "$profilePath.bak"
                     if (Test-Path $profilePath) {
                         Copy-Item -Path $profilePath -Destination $backupPath -Force
                         Write-Verbose "Profile backup created at: $($backupPath)"
                     }
                     Add-Content -Path $profilePath -Value "`n$importLine" -Encoding UTF8
-                    Write-Verbose "Added Import-Module line to: $($profilePath)"
+                    Write-Verbose "Added profile line to: $($profilePath)"
                     $profileUpdated = $true
                 }
             }
             else {
-                Write-Verbose 'Profile already contains Import-Module UserAdminModule — no change made.'
+                Write-Verbose 'Profile already contains a UserAdminModule entry — no change made.'
                 $profileUpdated = $true
             }
         }
@@ -164,6 +204,11 @@ function Initialize-UserAdminModule {
 
         Write-Information "UserAdminModule configured. Custom modules path: $($resolvedPath)" -InformationAction Continue
         Write-Information "Next: use New-PSM1Module -folderPath '$($resolvedPath)\MyCategory' to scaffold your first submodule." -InformationAction Continue
+
+        if ($UpdateProfile -and -not $UseSharedProfile) {
+            Write-Information 'Tip: re-run with -UseSharedProfile to configure the full shell UX (admin prompt, greeting, PSReadLine prediction). Example: Initialize-UserAdminModule -Path <path> -UpdateProfile -UseSharedProfile' -InformationAction Continue
+        }
+
         Write-Verbose 'Initialize-UserAdminModule completed.'
     }
 }

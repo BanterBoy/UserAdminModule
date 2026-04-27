@@ -1,6 +1,6 @@
 @{
     RootModule        = 'UserAdminModule.psm1'
-    ModuleVersion     = '1.0.4'
+    ModuleVersion     = '1.0.5'
     GUID              = 'c080b18e-78ca-453a-8f6b-6a86c9390267'
     Author            = 'Luke Leigh'
     CompanyName       = 'Banter Studio'
@@ -43,6 +43,18 @@ Quick start:
             ProjectUri   = 'https://useradminmodule.lukeleigh.com/'
             LicenseUri   = 'https://github.com/BanterBoy/UserAdminModule/blob/main/LICENSE'
             ReleaseNotes = @'
+v1.0.5 — Add -UseSharedProfile to Initialize-UserAdminModule
+  - New -UseSharedProfile switch: when combined with -UpdateProfile, writes a
+    dot-source line for the bundled shared profile instead of a bare Import-Module
+    line. Auto-detects $PSEdition: Desktop (PS 5.1) → SharedWindowsPowershellProfile.ps1;
+    Core (PS 7+) → SharedPowershellProfile.ps1
+  - Duplicate-detection now covers both the Import-Module pattern and the
+    SharedPowershellProfile/SharedWindowsPowershellProfile dot-source pattern so
+    re-running the command is idempotent
+  - End block nudge: informs users who used -UpdateProfile alone about -UseSharedProfile
+  - docs/getting-started.md: new 'Profile options' section explaining Option A vs B
+  - docs/reference.md: -UseSharedProfile added to Initialize-UserAdminModule table
+  - README.md: quick-start updated with Option A / Option B examples
 v1.0.4 — Fix submodule import and command detection (PSGallery regression, re-release)
   - 1.0.3 published with incomplete fixes; this supersedes it
   - Import-PersonalModules: added -Global to Import-Module so imported submodules
