@@ -58,7 +58,7 @@ Initialize-UserAdminModule -Path <string> [-UpdateProfile] [-UseSharedProfile] [
 |---|---|---|
 | `-Path` | String | Path to your custom modules root folder. Created automatically if it does not exist. |
 | `-UpdateProfile` | Switch | Appends a line to the current `$PROFILE` if not already present. By default, appends `Import-Module UserAdminModule`. Combine with `-UseSharedProfile` to append a dot-source line for the full shell UX instead. |
-| `-UseSharedProfile` | Switch | When combined with `-UpdateProfile`, writes a dot-source line for the bundled `SharedPowershellProfile.ps1` (PS 7+) or `SharedWindowsPowershellProfile.ps1` (PS 5.1) instead of a plain `Import-Module` line. The correct file is chosen automatically based on `$PSEdition`. |
+| `-UseSharedProfile` | Switch | When combined with `-UpdateProfile`, writes a dynamic resolution block to `$PROFILE` that locates the newest installed version of the shared profile at each session startup. On PS 7+ it loads `SharedPowershellProfile.ps1`; on PS 5.1 it loads `SharedWindowsPowershellProfile.ps1`. The correct file is chosen automatically based on `$PSEdition`. Version-upgrade-proof — `Update-Module` takes effect automatically without re-running this command. |
 
 **Examples:**
 

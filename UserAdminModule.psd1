@@ -1,6 +1,6 @@
 @{
     RootModule        = 'UserAdminModule.psm1'
-    ModuleVersion     = '1.0.5'
+    ModuleVersion     = '1.0.6'
     GUID              = 'c080b18e-78ca-453a-8f6b-6a86c9390267'
     Author            = 'Luke Leigh'
     CompanyName       = 'Banter Studio'
@@ -43,6 +43,21 @@ Quick start:
             ProjectUri   = 'https://useradminmodule.lukeleigh.com/'
             LicenseUri   = 'https://github.com/BanterBoy/UserAdminModule/blob/main/LICENSE'
             ReleaseNotes = @'
+v1.0.6 — Fix -UseSharedProfile: dynamic resolution block instead of hardcoded path
+  - Root cause of v1.0.5 bug: (Get-Module UserAdminModule).ModuleBase returned an
+    array when multiple module instances were loaded (dev + PSGallery), producing
+    a two-path concatenated string that failed as a dot-source argument
+  - New approach: -UseSharedProfile now writes a self-contained resolution block to
+    $PROFILE that calls Get-Module -ListAvailable at each session startup, sorts by
+    version descending and picks the newest installed copy. Immune to multi-instance,
+    version upgrades, reinstalls, and cross-machine portability issues
+  - $PSEdition detection still controls which filename is embedded in the block:
+    Desktop (PS 5.1) -> SharedWindowsPowershellProfile.ps1
+    Core   (PS 7+)   -> SharedPowershellProfile.ps1
+  - Block cleans up its own temporary variables with Remove-Variable
+  - Updated profiles/Microsoft.PowerShell_profile.ps1 OPTION B documentation
+  - Updated docs/getting-started.md Profile options section
+  - Updated docs/reference.md -UseSharedProfile parameter description
 v1.0.5 — Add -UseSharedProfile to Initialize-UserAdminModule
   - New -UseSharedProfile switch: when combined with -UpdateProfile, writes a
     dot-source line for the bundled shared profile instead of a bare Import-Module

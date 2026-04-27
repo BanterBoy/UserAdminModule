@@ -74,17 +74,22 @@ Use this if you only want the framework functions (`Import-PersonalModules`, `In
 Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile -UseSharedProfile
 ```
 
-Appends a dot-source line for the bundled shared profile instead of a bare `Import-Module`:
+Appends a self-contained resolution block that locates the newest installed version of the shared profile **at each session startup** — so it stays correct after `Update-Module` without re-running `Initialize-UserAdminModule`:
 
 ```powershell
-# PS 7+
-. "C:\Users\you\Documents\PowerShell\Modules\UserAdminModule\1.0.5\profiles\SharedPowershellProfile.ps1"
-
-# PS 5.1 / Windows PowerShell
-. "C:\Users\you\...\profiles\SharedWindowsPowershellProfile.ps1"
+# UserAdminModule shared profile — resolves automatically after module updates
+$_uamMod = Get-Module -Name UserAdminModule -ListAvailable |
+    Sort-Object Version -Descending | Select-Object -First 1
+if ($_uamMod) {
+    $_uamShared = Join-Path $_uamMod.ModuleBase 'profiles\SharedPowershellProfile.ps1'
+    if (Test-Path $_uamShared) { . $_uamShared }
+}
+Remove-Variable _uamMod, _uamShared -ErrorAction SilentlyContinue
 ```
 
-The correct file is chosen automatically based on `$PSEdition` — you do not need to specify which edition you are running. The shared profile configures:
+*(On PS 5.1 / Windows PowerShell, `SharedWindowsPowershellProfile.ps1` is used — chosen automatically based on `$PSEdition`. You do not need to specify which edition you are running.)*
+
+The shared profile configures:
 
 - Admin-aware prompt with colour coding (`Set-PromptisAdmin`)
 - Console size and colour scheme (`Set-ConsoleConfig`)

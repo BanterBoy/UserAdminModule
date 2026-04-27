@@ -142,20 +142,37 @@ function Initialize-UserAdminModule {
 
             # Build the profile line to write
             if ($UseSharedProfile) {
-                # Pick the correct shared profile based on PS edition.
-                # PS 5.1 = Desktop edition; PS 7+ = Core edition.
-                $_sharedFile = if ($PSEdition -eq 'Desktop') {
-                    'SharedWindowsPowershellProfile.ps1'
+                # Write a self-resolving block that locates the newest installed
+                # version of the shared profile at each session startup.
+                # This avoids hardcoding a path that breaks after Update-Module,
+                # module reinstall, or when multiple module instances are in session.
+                # $PSEdition determines which shared profile filename to embed — the
+                # resolution itself happens at session start, not at init time.
+                if ($PSEdition -eq 'Desktop') {
+                    $importLine = @'
+
+# UserAdminModule shared profile — resolves automatically after module updates
+$_uamMod = Get-Module -Name UserAdminModule -ListAvailable |
+    Sort-Object Version -Descending | Select-Object -First 1
+if ($_uamMod) {
+    $_uamShared = Join-Path $_uamMod.ModuleBase 'profiles\SharedWindowsPowershellProfile.ps1'
+    if (Test-Path $_uamShared) { . $_uamShared }
+}
+Remove-Variable _uamMod, _uamShared -ErrorAction SilentlyContinue
+'@
                 } else {
-                    'SharedPowershellProfile.ps1'
+                    $importLine = @'
+
+# UserAdminModule shared profile — resolves automatically after module updates
+$_uamMod = Get-Module -Name UserAdminModule -ListAvailable |
+    Sort-Object Version -Descending | Select-Object -First 1
+if ($_uamMod) {
+    $_uamShared = Join-Path $_uamMod.ModuleBase 'profiles\SharedPowershellProfile.ps1'
+    if (Test-Path $_uamShared) { . $_uamShared }
+}
+Remove-Variable _uamMod, _uamShared -ErrorAction SilentlyContinue
+'@
                 }
-                # Resolve the bundled profile path from the installed module.
-                $_uamBase = (Get-Module UserAdminModule -ErrorAction SilentlyContinue).ModuleBase
-                if (-not $_uamBase) {
-                    $_uamBase = if ($Script:UAMModuleRoot) { $Script:UAMModuleRoot } else { Split-Path $PSScriptRoot -Parent }
-                }
-                $_sharedPath = Join-Path $_uamBase "profiles\$($_sharedFile)"
-                $importLine  = ". `"$($_sharedPath)`""
                 $_matchPattern = 'SharedPowershellProfile|SharedWindowsPowershellProfile'
             } else {
                 $importLine    = 'Import-Module UserAdminModule -ErrorAction SilentlyContinue'
