@@ -76,13 +76,18 @@ No hardcoded category lists. No `.psd1` maintenance per function. Works on any m
 # Install the module (current release is a preview)
 Install-Module UserAdminModule -AllowPrerelease -Scope CurrentUser
 
-# One-time setup — tell the module where your custom submodules will live
+# Option A — Minimal setup (Import-Module only)
 Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile
+
+# Option B — Full shell UX (admin prompt, greeting, PSReadLine — PS edition auto-detected)
+Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile -UseSharedProfile
 ```
 
 `Initialize-UserAdminModule` will:
 - Create `C:\MyModules` if it doesn't exist
-- Write `Import-Module UserAdminModule` to your `$PROFILE` (with a `.bak` backup first)
+- Write a line to your `$PROFILE` (with a `.bak` backup first):
+  - **Option A**: `Import-Module UserAdminModule -ErrorAction SilentlyContinue`
+  - **Option B**: dot-sources the bundled `SharedPowershellProfile.ps1` (PS 7+) or `SharedWindowsPowershellProfile.ps1` (PS 5.1) — chosen automatically
 - Store the path in `$env:APPDATA\UserAdminModule\config.json`
 
 Open a **new PowerShell session** — the module loads automatically.
@@ -176,7 +181,7 @@ The `profiles/` folder contains full shell environment profiles that add the adm
 . "$($(Get-Module UserAdminModule -ListAvailable | Select-Object -First 1).ModuleBase)\profiles\SharedWindowsPowershellProfile.ps1"
 ```
 
-Or simply run `Initialize-UserAdminModule -UpdateProfile` for the minimal auto-setup (adds `Import-Module UserAdminModule` to `$PROFILE`).
+Or run `Initialize-UserAdminModule -UpdateProfile -UseSharedProfile` — it automatically picks the right shared profile for your PS edition and writes the dot-source line for you.
 
 ---
 

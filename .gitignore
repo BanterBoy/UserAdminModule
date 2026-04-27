@@ -1,3 +1,7 @@
+# Temporary rollback snapshots — never commit these
+.temp_commit_revert/
+*.nuspec
+
 # Profile backups (created by Initialize-UserAdminModule -UpdateProfile)
 *.bak
 

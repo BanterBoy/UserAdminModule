@@ -19,20 +19,31 @@
 
     OPTION B — Full shared profile (all UX features)
     ──────────────────────────────────────────────────
-    For PSGallery install, add to your $PROFILE:
-        . "$($(Get-Module UserAdminModule -ListAvailable | Select-Object -First 1).ModuleBase)\profiles\SharedPowershellProfile.ps1"
+    Run: Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile -UseSharedProfile
+    This writes the dynamic resolution block below to your $PROFILE automatically.
+    It resolves the newest installed version at each session startup — so it stays
+    correct after Update-Module without re-running Initialize-UserAdminModule.
 
-    For a repo clone, add to your $PROFILE:
-        . "C:\Path\To\UserAdminModule\profiles\SharedPowershellProfile.ps1"
+    PS 7+ / Core — written to $PROFILE:
 
-    SharedPowershellProfile.ps1 adds:
+        # UserAdminModule shared profile — resolves automatically after module updates
+        $_uamMod = Get-Module -Name UserAdminModule -ListAvailable |
+            Sort-Object Version -Descending | Select-Object -First 1
+        if ($_uamMod) {
+            $_uamShared = Join-Path $_uamMod.ModuleBase 'profiles\SharedPowershellProfile.ps1'
+            if (Test-Path $_uamShared) { . $_uamShared }
+        }
+        Remove-Variable _uamMod, _uamShared -ErrorAction SilentlyContinue
+
+    Windows PowerShell 5.1 — same block, but loads SharedWindowsPowershellProfile.ps1.
+    The correct file is chosen automatically based on $PSEdition.
+
+    SharedPowershellProfile.ps1 / SharedWindowsPowershellProfile.ps1 adds:
       - PSReadLine history prediction + F1 context help
       - Console sizing (Set-ConsoleConfig)
       - Notepad++ alias
       - Startup timer
       - Graceful degradation if module is not installed
-
-    For Windows PowerShell 5.1, use SharedWindowsPowershellProfile.ps1 instead.
 #>
 
 # ── Load UserAdminModule ───────────────────────────────────────────────────────
