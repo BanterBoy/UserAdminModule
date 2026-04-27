@@ -6,8 +6,7 @@ description: >
 baseurl: ""
 url: "https://useradminmodule.lukeleigh.com"
 
-remote_theme: mmistakes/minimal-mistakes@4.17.2
-minimal_mistakes_skin: dark
+theme: jekyll-theme-primer
 
 name: "UserAdminModule"
 subtitle: "Stop dot-sourcing. Start managing. A PowerShell module framework that makes administrator functions discoverable."
@@ -56,7 +55,6 @@ gh_edit_source: docs
 gh_edit_view_mode: "edit"
 
 plugins:
-  - jekyll-remote-theme
   - jekyll-feed
   - jekyll-sitemap
 

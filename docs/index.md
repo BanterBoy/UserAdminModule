@@ -1,5 +1,5 @@
 ---
-layout: home
+layout: default
 title: Home
 nav_order: 1
 description: "Stop dot-sourcing. A PowerShell module framework that makes managing administrator functions simple, discoverable, and shareable."
