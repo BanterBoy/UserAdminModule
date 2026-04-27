@@ -1,6 +1,6 @@
 @{
     RootModule        = 'UserAdminModule.psm1'
-    ModuleVersion     = '1.0.7'
+    ModuleVersion     = '1.0.8'
     GUID              = 'c080b18e-78ca-453a-8f6b-6a86c9390267'
     Author            = 'Luke Leigh'
     CompanyName       = 'Banter Studio'
@@ -43,6 +43,12 @@ Quick start:
             ProjectUri   = 'https://useradminmodule.lukeleigh.com/'
             LicenseUri   = 'https://github.com/BanterBoy/UserAdminModule/blob/main/LICENSE'
             ReleaseNotes = @'
+v1.0.8 — Fix Getting Started modal in ModuleMenuApp
+  - New-ModuleMenuApp.ps1 setup guide previously showed steps to clone RDGScripts
+    instead of the correct PSGallery install steps for UserAdminModule
+  - Fix: steps now correctly show Install-Module UserAdminModule,
+    Initialize-UserAdminModule -Path, Import-Module in $PROFILE,
+    and Import-PersonalModules -Category
 v1.0.7 — Fix submodule scope (Import-PersonalModules -Global)
   - Root cause of all "Import-PersonalModules imports nothing" reports: Import-Module
     was called without -Global, so submodules were loaded into UserAdminModule's private
