@@ -1,5 +1,5 @@
 ---
-layout: single
+layout: default
 title: Building Your Function Library
 nav_order: 5
 ---

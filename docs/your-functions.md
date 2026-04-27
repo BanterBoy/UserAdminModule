@@ -1,14 +1,20 @@
 ---
-layout: single
+layout: default
 title: Bring Your Own Functions
 nav_order: 3
 description: "Organise an existing PowerShell function library with UserAdminModule."
-toc: true
 ---
 
 # Bring Your Own Functions
+{: .no_toc }
 
 UserAdminModule does not ship your admin functions — it manages them. Any collection of `.ps1` files can be brought in. This page shows how to organise an existing library and what it looks like in practice.
+
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
 
 ---
 
@@ -65,7 +71,8 @@ ADFunctions\
 
 The `.psm1` dot-sources every `.ps1` file in `Public\` automatically. `New-PSM1Module` generates this boilerplate for you, but if your folders already follow this shape they are already compatible.
 
-> **Tip:** `Public\` and `Private\` are **not** picked up as false-positive categories — they contain no matching `.psm1`, so the discovery logic skips them.
+{: .tip }
+> `Public\` and `Private\` are **not** picked up as false-positive categories — they contain no matching `.psm1`, so the discovery logic skips them.
 
 ---
 

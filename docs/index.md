@@ -7,25 +7,17 @@ permalink: /
 ---
 
 # UserAdminModule
+{: .fs-9 }
 
 Stop dot-sourcing. Start managing.
+{: .fs-5 .fw-300 }
 
 Every administrator eventually hits the same wall: hundreds of functions scattered across scripts, dot-sourced in a `$PROFILE` that nobody wants to touch, impossible to share or deploy to a new machine.
 
 UserAdminModule solves this — without rewriting your functions or changing how you work.
 
-[Get Started]({{ site.baseurl }}/getting-started) | [View on GitHub](https://github.com/BanterBoy/UserAdminModule)
-
----
-
-## A better way to manage PowerShell functions
-
-Build a function library that is:
-
-- organised by category, not by ad hoc dot-sourcing
-- discoverable through tab completion and an interactive menu
-- easy to share, version, and deploy across machines
-- backed by searchable HTML reference docs for every command
+[Get Started]({{ site.baseurl }}/getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[View on GitHub](https://github.com/BanterBoy/UserAdminModule){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ---
 
@@ -139,4 +131,7 @@ Open-ModuleMenuApp
 | **PS 5.1 and 7+ compatible** | Works in Windows PowerShell and PowerShell 7+ |
 | **PSGallery published** | `Install-Module UserAdminModule` — nothing to clone, nothing to configure manually |
 
-> **Note:** UserAdminModule is currently published as a prerelease. Install with `-AllowPrerelease` until the stable `v1.0.0` release.
+---
+
+{: .note }
+> UserAdminModule is currently published as a prerelease. Install with `-AllowPrerelease` until the stable `v1.0.0` release.

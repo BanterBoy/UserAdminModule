@@ -1,12 +1,18 @@
 ---
-layout: single
+layout: default
 title: Getting Started
 nav_order: 2
 description: "Install and configure UserAdminModule in five minutes."
-toc: true
 ---
 
 # Getting Started
+{: .no_toc }
+
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
 
 ---
 
@@ -24,7 +30,8 @@ toc: true
 Install-Module UserAdminModule -AllowPrerelease -Scope CurrentUser
 ```
 
-> **Note:** `PSMenu` is a required dependency. PowerShellGet installs it automatically alongside UserAdminModule.
+{: .note }
+> `PSMenu` is a required dependency. PowerShellGet installs it automatically alongside UserAdminModule.
 
 ---
 
@@ -38,7 +45,8 @@ Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile
 
 This writes a `config.json` to `$env:APPDATA\UserAdminModule\` so every UserAdminModule command knows where to find your functions. You only need to run this once per machine.
 
-> **Tip:** If you already have functions in a folder like `C:\Scripts\AdminFunctions`, point `-Path` there. No restructuring needed yet — see [Bring Your Own Functions]({{ site.baseurl }}/your-functions) for how to make existing libraries compatible.
+{: .tip }
+> If you already have functions in a folder like `C:\Scripts\AdminFunctions`, point `-Path` there. No restructuring needed yet — see [Bring Your Own Functions]({{ site.baseurl }}/your-functions) for how to make existing libraries compatible.
 
 ---
 
@@ -102,7 +110,8 @@ The browser is built from `FunctionIndex.json`. Use `-Regenerate` to rebuild it 
 Open-ModuleMenuApp -Regenerate
 ```
 
-> **Tip:** `-Regenerate` handles everything automatically — it runs `Invoke-FunctionIndexRegeneration` if needed, then regenerates the HTML browser. You do not need to run any intermediate commands.
+{: .tip }
+> `-Regenerate` handles everything automatically — it runs `Invoke-FunctionIndexRegeneration` if needed, then regenerates the HTML browser. You do not need to run any intermediate commands.
 
 ---
 
