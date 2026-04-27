@@ -1,6 +1,6 @@
 @{
     RootModule        = 'UserAdminModule.psm1'
-    ModuleVersion     = '1.0.1'
+    ModuleVersion     = '1.0.2'
     GUID              = 'c080b18e-78ca-453a-8f6b-6a86c9390267'
     Author            = 'Luke Leigh'
     CompanyName       = 'Banter Studio'
@@ -38,16 +38,17 @@ Quick start:
     PrivateData = @{
         PSData = @{
             Tags = @(
-                'PowerShellGallery', 'UserAdminModule', 'AdminTools', 'FunctionLibrary', 'Profile', 'Prompt', 'Menu',
-                'ModuleScaffold', 'Documentation', 'HTMLReference', 'ActiveDirectory', 'Exchange', 'Azure', 'Intune',
-                'Security', 'PKI', 'Reporting', 'Automation', 'Productivity', 'Shell', 'Framework', 'CustomModules',
-                'Category', 'Submodule', 'Import', 'Scaffold', 'Interactive', 'PSMenu', 'Config', 'Index', 'Reference',
-                'Docs', 'Windows', 'CrossPlatform', 'PowerShell', 'Module', 'Functions', 'ProfileScript', 'Startup',
-                'Bootstrap', 'Discovery', 'TabCompletion', 'DynamicParam', 'UX', 'HTML', 'Web', 'MenuApp', 'Gallery'
-            )
+                'UserAdminModule', 'AdminTools', 'FunctionLibrary', 'Productivity', 'CustomModules', 'ScriptManagement'
+                )
             ProjectUri   = 'https://useradminmodule.lukeleigh.com/'
             LicenseUri   = 'https://github.com/BanterBoy/UserAdminModule/blob/main/LICENSE'
             ReleaseNotes = @'
+v1.0.2 — Minor fixes and improvements
+  - New-PSM1Module: added -Force parameter to overwrite existing module folders
+  - New-PSM1Module: improved error handling for invalid folder paths
+  - Initialize-UserAdminModule: added check to prevent duplicate profile entries
+  - Updated documentation for new parameters and edge cases
+  - All changes validated for PS 5.1/7+ compatibility and repo conventions
 v1.0.1 — Stable release (all recent changes)
   - All Shell/Public/ functions now use [CmdletBinding()], trap, and full help
   - Set-DisplayIsAdmin.ps1 deleted (duplicate)
