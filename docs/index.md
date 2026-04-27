@@ -24,7 +24,7 @@ UserAdminModule solves this — without rewriting your functions or changing how
 ## Install in seconds
 
 ```powershell
-Install-Module UserAdminModule -AllowPrerelease
+Install-Module UserAdminModule
 Initialize-UserAdminModule -Path 'C:\MyModules' -UpdateProfile
 ```
 
@@ -133,5 +133,3 @@ Open-ModuleMenuApp
 
 ---
 
-{: .note }
-> UserAdminModule is currently published as a prerelease. Install with `-AllowPrerelease` until the stable `v1.0.0` release.

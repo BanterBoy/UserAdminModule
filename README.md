@@ -289,7 +289,7 @@ Prerelease    = 'preview2'    # users install with -AllowPrerelease
 ModuleVersion = '1.0.0'
 ```
 
-**Important:** Update `ProjectUri` in the manifest to point to your own GitHub repository (not `BanterBoy/RDGScripts`).
+**Important:** Update `ProjectUri` in the manifest to point to your own GitHub repository (not `BanterBoy/UserAdminModule`).
 
 ### Setting Up the GitHub Repository
 
