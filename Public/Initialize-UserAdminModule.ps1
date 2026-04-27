@@ -188,24 +188,50 @@ Remove-Variable _uamCfg, _uamShared -ErrorAction SilentlyContinue
                 $_matchPattern = 'Import-Module UserAdminModule'
             }
 
+            # Ensure profile file exists
             if (-not (Test-Path $profilePath)) {
                 if ($PSCmdlet.ShouldProcess($profilePath, 'Create PowerShell profile file')) {
+                    $profileDir = Split-Path $profilePath -Parent
+                    if (-not (Test-Path $profileDir)) {
+                        New-Item -Path $profileDir -ItemType Directory -Force | Out-Null
+                    }
                     New-Item -Path $profilePath -ItemType File -Force | Out-Null
+                    Write-Verbose "Created profile file: $($profilePath)"
                 }
             }
 
             $existingContent = Get-Content -Path $profilePath -Raw -ErrorAction SilentlyContinue
+            # Treat null/empty as empty string
+            if (-not $existingContent) { $existingContent = '' }
+
+            Write-Verbose "Profile path: $($profilePath)"
+            Write-Verbose "Profile writable: $(try { [System.IO.File]::OpenWrite($profilePath).Close(); 'Yes' } catch { 'NO - ' + $_.Exception.Message })"
 
             if ($existingContent -notmatch $_matchPattern) {
                 if ($PSCmdlet.ShouldProcess($profilePath, "Add profile line to $($profilePath)")) {
+                    # Backup first
                     $backupPath = "$profilePath.bak"
-                    if (Test-Path $profilePath) {
-                        Copy-Item -Path $profilePath -Destination $backupPath -Force
-                        Write-Verbose "Profile backup created at: $($backupPath)"
+                    Copy-Item -Path $profilePath -Destination $backupPath -Force -ErrorAction SilentlyContinue
+                    Write-Verbose "Profile backup created at: $($backupPath)"
+
+                    # Read-modify-write: build complete new content and write entire file back.
+                    # Avoids Add-Content encoding and buffering issues.
+                    $separator = if ($existingContent.Length -gt 0) { "`n`n" } else { '' }
+                    $newContent = $existingContent.TrimEnd() + $separator + $importLine + "`n"
+
+                    [System.IO.File]::WriteAllText($profilePath, $newContent, [System.Text.Encoding]::UTF8)
+
+                    # Verify the write actually worked
+                    $verify = Get-Content -Path $profilePath -Raw -ErrorAction SilentlyContinue
+                    if ($verify -and $verify -match [regex]::Escape('UserAdminModule')) {
+                        Write-Verbose "Profile write verified: $($profilePath)"
+                        $profileUpdated = $true
                     }
-                    Add-Content -Path $profilePath -Value "`n$importLine" -Encoding UTF8
-                    Write-Verbose "Added profile line to: $($profilePath)"
-                    $profileUpdated = $true
+                    else {
+                        Write-Warning "Profile write to $($profilePath) could not be verified. Check file permissions and try again."
+                        # Restore backup
+                        Copy-Item -Path $backupPath -Destination $profilePath -Force -ErrorAction SilentlyContinue
+                    }
                 }
             }
             else {
