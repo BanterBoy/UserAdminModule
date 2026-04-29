@@ -3,6 +3,9 @@ description: >
   Stop dot-sourcing. Start managing. A PowerShell function management
   framework that gives any administrator a superpower in their own shell.
 
+logo: "/images/logo.svg"
+favicon_ico: "/images/favicon.svg"
+
 baseurl: ""
 url: "https://useradminmodule.lukeleigh.com"
 
