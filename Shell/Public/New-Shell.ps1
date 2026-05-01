@@ -136,17 +136,25 @@ function New-Shell {
         $principal = New-Object System.Security.Principal.WindowsPrincipal($identity)
         $isElevated = $principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 
-        # Helper function to check executable
+        # Helper function to resolve an executable to its full path.
+        # Returns the absolute path string when found, otherwise $null.
+        # ShellExecute (`Start-Process -Verb RunAs`) needs a fully-qualified
+        # path or an App Paths registry entry — `pwsh.exe` is not always
+        # registered there, so resolving via Get-Command up-front avoids the
+        # "system cannot find all the information required" error.
         function Test-Executable {
             param ([string]$Path)
             trap {
                 Write-Verbose "Executable not found: $Path"
-                return $false
+                return $null
             }
-            if (Get-Command $Path -ErrorAction SilentlyContinue) {
-                return $true
+            $cmd = Get-Command -Name $Path -ErrorAction SilentlyContinue |
+                Where-Object { $_.CommandType -eq 'Application' } |
+                Select-Object -First 1
+            if ($cmd -and $cmd.Source) {
+                return $cmd.Source
             }
-            return $false
+            return $null
         }
 
         switch ($PSCmdlet.ParameterSetName) {
@@ -156,7 +164,8 @@ function New-Shell {
                 }
                 switch ($User) {
                     'PowerShell' {
-                        if (-not (Test-Executable 'PowerShell.exe')) {
+                        $exePath = Test-Executable 'PowerShell.exe'
+                        if (-not $exePath) {
                             Write-Error "PowerShell.exe not found."
                             return
                         }
@@ -164,11 +173,12 @@ function New-Shell {
                             Write-Error "Failed to launch PowerShell: $_"
                             break
                         }
-                        Start-Process -FilePath "PowerShell.exe" -PassThru
-                        Write-Verbose "Launched PowerShell."
+                        Start-Process -FilePath $exePath -PassThru
+                        Write-Verbose "Launched PowerShell from $exePath."
                     }
                     'pwsh' {
-                        if (-not (Test-Executable 'pwsh.exe')) {
+                        $exePath = Test-Executable 'pwsh.exe'
+                        if (-not $exePath) {
                             Write-Error "pwsh.exe not found."
                             return
                         }
@@ -176,8 +186,8 @@ function New-Shell {
                             Write-Error "Failed to launch PowerShell Core: $_"
                             break
                         }
-                        Start-Process -FilePath "pwsh.exe" -PassThru
-                        Write-Verbose "Launched PowerShell Core."
+                        Start-Process -FilePath $exePath -PassThru
+                        Write-Verbose "Launched PowerShell Core from $exePath."
                     }
                     default {
                         Write-Error "Invalid value for -User parameter: $User"
@@ -190,7 +200,8 @@ function New-Shell {
                 }
                 switch ($RunAs) {
                     'PowerShellRunAs' {
-                        if (-not (Test-Executable 'PowerShell.exe')) {
+                        $exePath = Test-Executable 'PowerShell.exe'
+                        if (-not $exePath) {
                             Write-Error "PowerShell.exe not found."
                             return
                         }
@@ -198,11 +209,14 @@ function New-Shell {
                             Write-Error "Failed to launch elevated PowerShell: $_"
                             break
                         }
-                        Start-Process -FilePath "PowerShell.exe" -Verb RunAs -PassThru
-                        Write-Verbose "Launched elevated PowerShell."
+                        # ShellExecute (-Verb RunAs) needs a fully-qualified path or an
+                        # App Paths registry entry; pass the resolved Source from Get-Command.
+                        Start-Process -FilePath $exePath -Verb RunAs -PassThru
+                        Write-Verbose "Launched elevated PowerShell from $exePath."
                     }
                     'pwshRunAs' {
-                        if (-not (Test-Executable 'pwsh.exe')) {
+                        $exePath = Test-Executable 'pwsh.exe'
+                        if (-not $exePath) {
                             Write-Error "pwsh.exe not found."
                             return
                         }
@@ -210,8 +224,12 @@ function New-Shell {
                             Write-Error "Failed to launch elevated PowerShell Core: $_"
                             break
                         }
-                        Start-Process -FilePath "pwsh.exe" -Verb RunAs -PassThru
-                        Write-Verbose "Launched elevated PowerShell Core."
+                        # ShellExecute (-Verb RunAs) needs a fully-qualified path or an
+                        # App Paths registry entry; pwsh.exe is not always registered there
+                        # (pass Get-Command's resolved Source to avoid "system cannot find
+                        # all the information required").
+                        Start-Process -FilePath $exePath -Verb RunAs -PassThru
+                        Write-Verbose "Launched elevated PowerShell Core from $exePath."
                     }
                     default {
                         Write-Error "Invalid value for -RunAs parameter: $RunAs"
