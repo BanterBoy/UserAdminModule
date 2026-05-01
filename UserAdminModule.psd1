@@ -1,6 +1,6 @@
 @{
     RootModule        = 'UserAdminModule.psm1'
-    ModuleVersion     = '1.0.8'
+    ModuleVersion     = '1.0.9'
     GUID              = 'c080b18e-78ca-453a-8f6b-6a86c9390267'
     Author            = 'Luke Leigh'
     CompanyName       = 'Banter Studio'
@@ -43,6 +43,14 @@ Quick start:
             ProjectUri   = 'https://useradminmodule.lukeleigh.com/'
             LicenseUri   = 'https://github.com/BanterBoy/UserAdminModule/blob/main/LICENSE'
             ReleaseNotes = @'
+v1.0.9 — Fix New-Shell executable resolution for -RunAs and -TerminalRunAs
+  - Root cause: Start-Process -Verb RunAs (ShellExecute) requires a fully-qualified
+    path or an App Paths registry entry; pwsh.exe is not always registered there,
+    causing "system cannot find all the information required" errors when elevating
+  - Fix: added Test-Executable helper in New-Shell that resolves shell executables
+    via Get-Command before launch, guaranteeing an absolute path is passed to
+    Start-Process regardless of App Paths registration
+  - Affects: -RunAs (PowerShellRunAs, pwshRunAs) and -TerminalRunAs parameter sets
 v1.0.8 — Fix Getting Started modal in ModuleMenuApp
   - New-ModuleMenuApp.ps1 setup guide previously showed steps to clone RDGScripts
     instead of the correct PSGallery install steps for UserAdminModule
